@@ -82,6 +82,9 @@ public class Controller {
 
     @FXML
     private ToggleGroup sortingToggleGroup;
+    
+    @FXML
+    private MenuItem showPatternsPLD;
 
 
     private HBox pldButtonBar;
@@ -201,6 +204,7 @@ public class Controller {
                 showPLDMenuItem.setDisable(true);
                 exportProjectMenuItem.setDisable(true);
                 closePLDMenuItem.setDisable(true);
+                showPatternsPLD.setDisable(true);
                 break;
             case DATA_NO_PLD:
                 sortingOptions.setDisable(false);
@@ -211,12 +215,14 @@ public class Controller {
                 showPLDButton.setDisable(false);
                 showPLDMenuItem.setDisable(false);
                 exportProjectMenuItem.setDisable(false);
+                showPatternsPLD.setDisable(false);
                 break;
             case PLD:
                 screenShotMenuItem.setDisable(false);
                 showPLDButton.setDisable(true);
                 showPLDMenuItem.setDisable(true);
                 closePLDMenuItem.setDisable(false);
+                showPatternsPLD.setDisable(false);
                 break;
             default:
         }
@@ -542,5 +548,10 @@ public class Controller {
         diagramsVBox.getChildren().add(pld);
 
         enableButtons(GuiCondition.PLD);
+    }
+    
+    @FXML
+    public void showPatternsPLD() {
+    	mainController.getPatterns();
     }
 }

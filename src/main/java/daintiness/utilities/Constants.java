@@ -58,4 +58,14 @@ public class Constants {
         MEASUREMENT,
         DEFAULT
     }
+    
+    public enum PatternType
+    {
+        MULTIPLE_BIRTHS,
+        MULTIPLE_UPDATES,
+        MULTIPLE_DEATHS,
+        LADDER
+    }
+    
+    
 }

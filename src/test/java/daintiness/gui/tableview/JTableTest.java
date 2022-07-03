@@ -25,7 +25,7 @@ import daintiness.models.TimeEntityMeasurements;
 import daintiness.utilities.Constants;
 import javafx.collections.ObservableList;
 
-public class TableviewTest {
+public class JTableTest {
 	MainController mainController = new MainController();
 	File originalFile = new File(
 			"src" + Constants.FS + "test" + Constants.FS + "resources" + Constants.FS + "RefactoringTestData");

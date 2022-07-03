@@ -33,6 +33,8 @@
                     <MenuItem fx:id="showPLDMenuItem" text="Show PLD" onAction="#showPLD"/>
 
                     <MenuItem fx:id="closePLDMenuItem" text="Close PLD" onAction="#closePLD"/>
+                    
+                    <MenuItem fx:id="showPatternsPLD" text="Show Patterns" onAction="#showPatternsPLD"/>
                 </Menu>
             </MenuBar>
         </VBox>

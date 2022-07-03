@@ -9,6 +9,7 @@ import daintiness.clustering.ClusteringProfile;
 import daintiness.clustering.EntityGroup;
 import daintiness.clustering.Phase;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
+import daintiness.models.PatternData;
 import daintiness.utilities.Constants;
 
 /**
@@ -166,4 +167,8 @@ public interface IMainController {
      * @param projectFolder input folder
      */
     void importProject(File projectFolder);
+
+
+
+	List<PatternData> getPatterns();
 }

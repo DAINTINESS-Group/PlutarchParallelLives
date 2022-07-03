@@ -10,14 +10,17 @@ import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 import daintiness.data.IDataHandler;
 import daintiness.io.FileHandlerFactory;
 import daintiness.io.IFileHandler;
+import daintiness.models.PatternData;
+import daintiness.patterns.IPatternManager;
+import daintiness.patterns.PatternManagerFactory;
 import daintiness.utilities.Constants;
-
 
 
 public class MainController implements IMainController {
     private IFileHandler fileHandler;
     private IDataHandler dataHandler;
     private IClusteringHandler clusteringHandler;
+    private IPatternManager patternManager;
 
 
     @Override
@@ -146,5 +149,17 @@ public class MainController implements IMainController {
     @Override
     public int getNumberOfTEMs() {
         return dataHandler.getNumberOfTEMs();
+    }
+    
+    
+    @Override
+    public List<PatternData> getPatterns() {
+    	PatternManagerFactory patternManagerFactory = new PatternManagerFactory();
+    	patternManager = patternManagerFactory.getPatternManager("SIMPLE_PATTERN_MANAGER");
+
+    	clusteringHandler.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+    	ObservableList<ChartGroupPhaseMeasurement> TotalValues = clusteringHandler.getChartData();
+    	List<Phase> TotalPhases = clusteringHandler.getPhases();
+        return patternManager.getPatterns(TotalValues, TotalPhases);
     }
 }
