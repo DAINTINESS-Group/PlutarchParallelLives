@@ -33,8 +33,18 @@
                     <MenuItem fx:id="showPLDMenuItem" text="Show PLD" onAction="#showPLD"/>
 
                     <MenuItem fx:id="closePLDMenuItem" text="Close PLD" onAction="#closePLD"/>
+
+                </Menu>
+                <Menu fx:id="PatternsMenu" text="ShowPatterns">
+                    <MenuItem fx:id="showBirthsPatterns" text="Show Births Patterns" onAction="#showBirthsPatterns"/>
+                                        
+                    <MenuItem fx:id="showUpdatesPatterns" text="Show Updates Patterns" onAction="#showUpdatesPatterns"/>
                     
-                    <MenuItem fx:id="showPatternsPLD" text="Show Patterns" onAction="#showPatternsPLD"/>
+                    <MenuItem fx:id="showDeathsPatterns" text="Show Deaths Patterns" onAction="#showDeathsPatterns"/>
+                    
+                    <MenuItem fx:id="showLadderPatterns" text="Show Ladder Patterns" onAction="#showLadderPatterns"/>
+                    
+                    <MenuItem fx:id="showAllPatterns" text="Show All Patterns" onAction="#showAllPatterns"/>
                 </Menu>
             </MenuBar>
         </VBox>

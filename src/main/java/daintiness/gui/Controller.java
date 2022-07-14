@@ -29,17 +29,22 @@ import daintiness.clustering.EntityGroup;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 import daintiness.gui.details.EntityGroupDetails;
 import daintiness.gui.details.PhaseDetails;
+
 import daintiness.gui.tableview.PLDiagram;
+
 import daintiness.maincontroller.IMainController;
 import daintiness.maincontroller.MainControllerFactory;
+import daintiness.models.PatternData;
 import daintiness.models.measurement.IMeasurement;
 import daintiness.utilities.Constants;
 
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public class Controller {
@@ -84,7 +89,17 @@ public class Controller {
     private ToggleGroup sortingToggleGroup;
     
     @FXML
-    private MenuItem showPatternsPLD;
+    private Menu PatternsMenu;
+    @FXML
+    private MenuItem showBirthsPatterns;
+    @FXML
+    private MenuItem showUpdatesPatterns;
+    @FXML
+    private MenuItem showDeathsPatterns;
+    @FXML
+    private MenuItem showLadderPatterns;
+    @FXML
+    private MenuItem showAllPatterns;
 
 
     private HBox pldButtonBar;
@@ -94,6 +109,8 @@ public class Controller {
     private final File initialDirectory = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "data");
 
     private PLDiagram pld;
+    
+    private PLDiagram patternsHiglightPLD;
 
     private final ObjectProperty<Constants.SelectedCellType> selectedCellTypeProperty = new SimpleObjectProperty<>(Constants.SelectedCellType.DEFAULT);
 
@@ -204,7 +221,7 @@ public class Controller {
                 showPLDMenuItem.setDisable(true);
                 exportProjectMenuItem.setDisable(true);
                 closePLDMenuItem.setDisable(true);
-                showPatternsPLD.setDisable(true);
+                PatternsMenu.setDisable(true);
                 break;
             case DATA_NO_PLD:
                 sortingOptions.setDisable(false);
@@ -215,14 +232,14 @@ public class Controller {
                 showPLDButton.setDisable(false);
                 showPLDMenuItem.setDisable(false);
                 exportProjectMenuItem.setDisable(false);
-                showPatternsPLD.setDisable(false);
+                PatternsMenu.setDisable(false);
                 break;
             case PLD:
                 screenShotMenuItem.setDisable(false);
                 showPLDButton.setDisable(true);
                 showPLDMenuItem.setDisable(true);
                 closePLDMenuItem.setDisable(false);
-                showPatternsPLD.setDisable(false);
+                PatternsMenu.setDisable(false);
                 break;
             default:
         }
@@ -285,7 +302,7 @@ public class Controller {
 
         pld = new PLDiagram(
                 mainController.getChartData(),
-                mainController.getPhases());
+                mainController.getPhases(),null);
 
 
         selectedCellTypeProperty.bind(pld.selectedCellTypeProperty());
@@ -346,7 +363,7 @@ public class Controller {
         }
         pld = new PLDiagram(
                 mainController.getChartData(),
-                mainController.getPhases());
+                mainController.getPhases(),null);
         showPLD();
         
         createJTableMouseListener();
@@ -551,7 +568,60 @@ public class Controller {
     }
     
     @FXML
-    public void showPatternsPLD() {
-    	mainController.getPatterns();
+    public void showAllPatterns() {
+    	
+    	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+    	
+    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.NO_TYPE);
+    	createJFrameHighlightedPatterns(patternList);
+    	
+    }
+    @FXML
+    public void showBirthsPatterns() {
+    	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+    	
+    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_BIRTHS);
+    	createJFrameHighlightedPatterns(patternList);
+    	
+    }
+    @FXML
+    public void showUpdatesPatterns() {
+    	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+    	
+    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_UPDATES);
+    	createJFrameHighlightedPatterns(patternList);
+    }
+    @FXML
+    public void showDeathsPatterns() {
+    	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+    	
+    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_DEATHS);
+    	createJFrameHighlightedPatterns(patternList);
+    }
+    @FXML
+    public void showLadderPatterns() {
+    	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+    	
+    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.LADDER);
+    	createJFrameHighlightedPatterns(patternList);
+    }
+    
+    private void createJFrameHighlightedPatterns(List<PatternData> patternList) {
+    	patternsHiglightPLD = new PLDiagram(
+                mainController.getChartData(),
+                mainController.getPhases(),patternList);
+    	
+    	javax.swing.JFrame frame = new javax.swing.JFrame(); 
+        
+	       
+		javafx.embed.swing.JFXPanel fxPanel = new javafx.embed.swing.JFXPanel();
+		javafx.scene.Scene sc = new javafx.scene.Scene(patternsHiglightPLD);
+		fxPanel.setScene(sc);
+        
+		frame.setTitle("PLD with patterns highlighted");
+        frame.add(fxPanel);
+        frame.setSize(new Dimension(600,600));
+        frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
     }
 }

@@ -61,6 +61,7 @@ public class Constants {
     
     public enum PatternType
     {
+    	NO_TYPE,
         MULTIPLE_BIRTHS,
         MULTIPLE_UPDATES,
         MULTIPLE_DEATHS,

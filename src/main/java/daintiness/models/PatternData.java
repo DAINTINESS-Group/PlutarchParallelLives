@@ -5,8 +5,8 @@ import java.util.List;
 import daintiness.utilities.Constants;
 
 public class PatternData {
-	private final Constants.PatternType PatternType;
-	private final List<CellInfo> PatternCellInfoList;
+	private Constants.PatternType PatternType;
+	private List<CellInfo> PatternCellInfoList;
 	
 	public PatternData(Constants.PatternType patternType, List<CellInfo> patternCellInfoList) {
         this.PatternType = patternType;
@@ -38,6 +38,12 @@ public class PatternData {
     	}
     	return null;
     }
+    
+    public void setPatternData(Constants.PatternType patternType,List<CellInfo> patternCellInfoList) {
+    	this.PatternType = patternType;
+    	this.PatternCellInfoList = patternCellInfoList;
+    }
+
     
     @Override
     public String toString() {

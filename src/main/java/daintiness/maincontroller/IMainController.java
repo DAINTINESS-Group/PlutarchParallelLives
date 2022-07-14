@@ -11,6 +11,7 @@ import daintiness.clustering.Phase;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 import daintiness.models.PatternData;
 import daintiness.utilities.Constants;
+import daintiness.utilities.Constants.PatternType;
 
 /**
  * This is the main API of the tool.
@@ -170,5 +171,5 @@ public interface IMainController {
 
 
 
-	List<PatternData> getPatterns();
+	List<PatternData> getPatterns(PatternType patternType);
 }

@@ -3,6 +3,7 @@ package daintiness.maincontroller;
 import javafx.collections.ObservableList;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import daintiness.clustering.*;
@@ -14,6 +15,7 @@ import daintiness.models.PatternData;
 import daintiness.patterns.IPatternManager;
 import daintiness.patterns.PatternManagerFactory;
 import daintiness.utilities.Constants;
+import daintiness.utilities.Constants.PatternType;
 
 
 public class MainController implements IMainController {
@@ -21,10 +23,18 @@ public class MainController implements IMainController {
     private IDataHandler dataHandler;
     private IClusteringHandler clusteringHandler;
     private IPatternManager patternManager;
+    private List<PatternData> totalPatternList = new ArrayList<PatternData>();
+    File selectedFile = new File("");
+    boolean fileHasChanged;
+    PatternType previousPatternType;
 
 
     @Override
     public void load(File inputFile){
+    	if(inputFile != selectedFile) {
+    		fileHasChanged = true;
+    	}
+    	
         FileHandlerFactory factory = new FileHandlerFactory();
         fileHandler = factory.getFileHandler("SIMPLE_FILE_HANDLER");
         fileHandler.setGivenFile(inputFile);
@@ -32,6 +42,7 @@ public class MainController implements IMainController {
         if (fileHandler.getFileType() == Constants.FileType.SCHEMA_EVO) {
             fileHandler.writeDataToFile(dataHandler.getTimeEntityMeasurementAsString());
         }
+        selectedFile = inputFile;
     }
 
 
@@ -153,13 +164,19 @@ public class MainController implements IMainController {
     
     
     @Override
-    public List<PatternData> getPatterns() {
-    	PatternManagerFactory patternManagerFactory = new PatternManagerFactory();
-    	patternManager = patternManagerFactory.getPatternManager("SIMPLE_PATTERN_MANAGER");
+    public List<PatternData> getPatterns(PatternType patternType) {
+    	if(totalPatternList.isEmpty() || fileHasChanged || (patternType != previousPatternType)) {
+    		PatternManagerFactory patternManagerFactory = new PatternManagerFactory();
+        	patternManager = patternManagerFactory.getPatternManager("SIMPLE_PATTERN_MANAGER");
 
-    	clusteringHandler.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
-    	ObservableList<ChartGroupPhaseMeasurement> TotalValues = clusteringHandler.getChartData();
-    	List<Phase> TotalPhases = clusteringHandler.getPhases();
-        return patternManager.getPatterns(TotalValues, TotalPhases);
+        	//clusteringHandler.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+        	ObservableList<ChartGroupPhaseMeasurement> TotalValues = clusteringHandler.getChartData();
+        	List<Phase> TotalPhases = clusteringHandler.getPhases();
+        	totalPatternList = patternManager.getPatterns(TotalValues, TotalPhases, patternType);
+    	}
+    	fileHasChanged = false;
+    	previousPatternType = patternType;    			
+    	patternManager.printPatterns(totalPatternList, patternType.toString(), selectedFile.getName());
+    	return totalPatternList;
     }
 }

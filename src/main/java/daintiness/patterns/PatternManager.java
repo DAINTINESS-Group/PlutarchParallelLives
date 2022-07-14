@@ -1,172 +1,70 @@
 package daintiness.patterns;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import daintiness.clustering.Phase;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 import daintiness.models.*;
-import daintiness.models.measurement.IMeasurement;
+import daintiness.patterns.patternAlgos.IPatternComputationHandler;
+import daintiness.patterns.patternAlgos.PatternComputationHandlerFactory;
 import daintiness.utilities.Constants;
+import daintiness.utilities.Constants.PatternType;
 import javafx.collections.ObservableList;
 
 public class PatternManager implements IPatternManager {
+	private IPatternComputationHandler patternComputationHandler;
 
-	
-	
-	public List<PatternData> getPatterns(ObservableList<ChartGroupPhaseMeasurement> totalValues, List<Phase> totalPhases) {
+	public List<PatternData> getPatterns(ObservableList<ChartGroupPhaseMeasurement> totalValues, List<Phase> totalPhases, PatternType patternType) {
+		
+		PatternComputationHandlerFactory patternComputationHandlerFactory = new PatternComputationHandlerFactory();
+		patternComputationHandler = patternComputationHandlerFactory.getPatternComputationHandler("SIMPLE_PATTERN_COMPUTATION_HANDLER");
 		
 		List<PatternData> patternList = new ArrayList<PatternData>();
-		
-		List<CellInfo> lastBirthCellsEachPhase = new ArrayList<CellInfo>();
 
-		List<String> TotalEntitiesNamesAscOrder = new ArrayList<String>(); 
-    	
-       
-		BirthsUpdatesDeathsPatternAlgo(totalValues, totalPhases, patternList, lastBirthCellsEachPhase, TotalEntitiesNamesAscOrder);	
-		
-		
-		LadderPatternAlgo(patternList, lastBirthCellsEachPhase, TotalEntitiesNamesAscOrder);
-    	
-		
-    	printPatterns(patternList);
-		 
-		     	
+		patternList = patternComputationHandler.computePatterns(totalValues, totalPhases, patternType);
+
+		//printPatterns(patternList);
         return patternList;
 	}
-	
 
-	
-	public void BirthsUpdatesDeathsPatternAlgo(ObservableList<ChartGroupPhaseMeasurement> totalValues, List<Phase> totalPhases, List<PatternData> patternList, List<CellInfo> lastBirthCellsEachPhase, List<String> TotalEntitiesNamesAscOrder) {
-		
-		for(Phase phase: totalPhases) {  		
-    		List<CellInfo> cellsMultipleBirths = new ArrayList<CellInfo>();
-    		List<CellInfo> cellsMultipleUpdates = new ArrayList<CellInfo>();
-    		List<CellInfo> cellsMultipleDeaths = new ArrayList<CellInfo>();
-    		
-    		for(ChartGroupPhaseMeasurement tab: totalValues) {
-    			
-    			var cellMeasurementType = tab.getEntityGroup().getGPMType(phase.getFirstPhaseBeat().getBeatId(), phase.getLastPhaseBeat().getBeatId());    			
-    			
-    			int phaseId = phase.getPhaseId();
-    			String entityName = tab.getEntityGroup().getGroupComponentsNames().get(0);
-    			
-    			
-    			if(phaseId == 0) {
-    				TotalEntitiesNamesAscOrder.add(entityName);
-    			}
-    			
-    			
-    			IMeasurement measurement = tab.getMeasurement(phase.getPhaseId());
-    			CellInfo cell = new CellInfo(entityName, phaseId, measurement);
-    			
-    			if(cellMeasurementType == Constants.GPMType.BIRTH){
-    				//lastBirthCellsEachPhase.add(cell);
-    				cellsMultipleBirths.add(cell);
-    			}
-    			else if(cellMeasurementType == Constants.GPMType.ACTIVE && tab.getMeasurement(phase.getPhaseId()) != null) {			
-    				cellsMultipleUpdates.add(cell);
-    			}
-    			else if(cellMeasurementType == Constants.GPMType.DEATH) {
-    				cellsMultipleDeaths.add(cell);
-    			}
-
-            }
-    		
-    		
-    		PatternData patternMultipleBirths = new PatternData(Constants.PatternType.MULTIPLE_BIRTHS,cellsMultipleBirths);
-    		PatternData patternMultipleUpdates = new PatternData(Constants.PatternType.MULTIPLE_UPDATES,cellsMultipleUpdates);
-    		PatternData patternMultipleDeaths = new PatternData(Constants.PatternType.MULTIPLE_DEATHS,cellsMultipleDeaths);
-    		
-    		if(cellsMultipleBirths.size() > 3) {
-    			patternList.add(patternMultipleBirths);
-    			
-    		}
-    		if(cellsMultipleUpdates.size() > 3){
-    			patternList.add(patternMultipleUpdates);
-    		}
-    		if(cellsMultipleDeaths.size() > 3){    			
-    			patternList.add(patternMultipleDeaths);
-    		}
-    		
-    		//LAST BIRTH CELL AT EACH PHASE
-    		if(patternMultipleBirths.getPatternCellsList().size() > 0) {
-    			CellInfo ladderCell = patternMultipleBirths.getLastCellOfPattern();    			
-    			lastBirthCellsEachPhase.add(ladderCell);        		
-    		}
-    		
-    	}
-	}
-	
-	
-	public void LadderPatternAlgo(List<PatternData> patternList, List<CellInfo> lastBirthCellsEachPhase, List<String> TotalEntitiesNamesAscOrder) {
-		List<CellInfo> cellsLadderPattern = new ArrayList<CellInfo>();
-    	
-    	for(int i = 0; i < lastBirthCellsEachPhase.size() - 1;i++) {    		
-    		CellInfo currentCell = lastBirthCellsEachPhase.get(i);
-    		
-    		
-    		CellInfo nextCell = lastBirthCellsEachPhase.get(i+1);
-    		    		
-    		
-    		int currentCellPhaseId = lastBirthCellsEachPhase.get(i).getPhaseId();
-    		
-    		
-    		int difPhases1 = nextCell.getPhaseId() - currentCellPhaseId;
-    		
-    		
-    		//To achieve the Ladder pattern we need to rearrange the table based on the ascending order of births, so we have to find the new position of the entities in the table.
-    		int currentCellEntityNameIndex = TotalEntitiesNamesAscOrder.indexOf(lastBirthCellsEachPhase.get(i).getEntityName());
-			int nextCellEntityNameIndex = TotalEntitiesNamesAscOrder.indexOf(lastBirthCellsEachPhase.get(i + 1).getEntityName());
+	public void printPatterns(List<PatternData> patternList, String patternTypeString, String fileNameString) {
+		try {
+			String directoryPath = "src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns";
 			
-			int difEntities1 = nextCellEntityNameIndex - currentCellEntityNameIndex;
-
-    		
-    		boolean ladderConnection = false;    		
-    		
-			if (difPhases1 <= 3 && difEntities1 <= 3 ) {
-				
-				cellsLadderPattern.add(currentCell);
-				cellsLadderPattern.add(nextCell);
-				ladderConnection = true;
+			File directory = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns");
+			if (!directory.exists()) {
+				directory.mkdirs();
 			}
-			if(ladderConnection == false) {
-				List<CellInfo> distinctCellsLadderPattern = cellsLadderPattern.stream().distinct().collect(Collectors.toList());
-				if(distinctCellsLadderPattern.size() >= 3) {
-					PatternData patternLadder = new PatternData(Constants.PatternType.LADDER, distinctCellsLadderPattern);
-					patternList.add(patternLadder);
+					
+			
+			String fileName = patternTypeString + "_" + fileNameString + ".txt";
+			File file = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns" +  Constants.FS + fileName);
+			FileWriter fileWriter = new FileWriter(file);
+			for (var pattern : patternList) {
+				//System.out.println(pattern.getPatternType().toString());
+				fileWriter.write(pattern.getPatternType().toString() + "\n");
 
-				}
-				
-				cellsLadderPattern = new ArrayList<CellInfo>();
-				
-			}
-    	}
-    	List<CellInfo> distinctCellsLadderPattern = cellsLadderPattern.stream().distinct().collect(Collectors.toList());
-    	if(distinctCellsLadderPattern.size() >= 3) {
-			PatternData patternLadder = new PatternData(Constants.PatternType.LADDER, distinctCellsLadderPattern);
-			patternList.add(patternLadder);
-
-		}
-	}
-	
-	public void printPatterns(List<PatternData> patternList) {
-		for (var pattern : patternList) {
-			System.out.println(pattern.getPatternType().toString());
-
-			if (pattern.getPatternCellsList().size() > 0) {
-				for (var item : pattern.getPatternCellsList()) {
-					if (item.getMeasurement() != null) {
-						System.out.println("Entity Name : " + item.getEntityName() + " PhaseId: " + item.getPhaseId()
-								+ " Measurement: " + item.getMeasurement().getValue());
-					} else {
-						System.out.println("Entity Name : " + item.getEntityName() + " PhaseId: " + item.getPhaseId()
-								+ " Measurement: " + item.getMeasurement());
+				if (pattern.getPatternCellsList().size() > 0) {
+					for (var item : pattern.getPatternCellsList()) {
+						
+						//System.out.println("Entity Name : " + item.getEntityName() + " PhaseId: " + item.getPhaseId());
+						fileWriter.write("Entity Name : " + item.getEntityName() + " PhaseId: " + item.getPhaseId() + "\n");
+						
 					}
 				}
+				//System.out.println("\n");
+				fileWriter.write("\n");
+				
 			}
-			System.out.println("\n");
+			fileWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 	}
 }

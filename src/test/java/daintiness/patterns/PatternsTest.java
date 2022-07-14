@@ -2,11 +2,7 @@ package daintiness.patterns;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -14,24 +10,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import daintiness.clustering.BeatClusteringProfile;
-import daintiness.clustering.ClusteringHandlerFactory;
 import daintiness.clustering.ClusteringProfile;
 import daintiness.clustering.EntityClusteringProfile;
-import daintiness.clustering.EntityGroup;
 import daintiness.clustering.IClusteringHandler;
 import daintiness.clustering.Phase;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 import daintiness.data.IDataHandler;
 import daintiness.io.input.ILoader;
-import daintiness.io.input.SimpleLoader;
 import daintiness.maincontroller.MainController;
-import daintiness.models.Beat;
 import daintiness.models.CellInfo;
-import daintiness.models.Entity;
 import daintiness.models.PatternData;
-import daintiness.models.measurement.EmptyIMeasurement;
-import daintiness.models.measurement.IMeasurement;
 import daintiness.utilities.Constants;
+import daintiness.utilities.Constants.PatternType;
 import javafx.collections.ObservableList;
 
 public class PatternsTest {
@@ -48,36 +38,25 @@ public class PatternsTest {
 	
 	
 	
-	List<PatternData> actualPatternList = new ArrayList<PatternData>();
-
-	List<CellInfo> lastBirthCellsEachPhase = new ArrayList<CellInfo>();
+	List<PatternData> expectedPatternList = new ArrayList<PatternData>();
+	PatternData patternData;
 	
-	List<String> TotalEntitiesNamesAscOrder = new ArrayList<String>();
 
 	Constants.MeasurementType measurementType = Constants.MeasurementType.RAW_VALUE;
     Constants.AggregationType aggregationType = Constants.AggregationType.SUM_OF_ALL;
+    
+    
+
 	
 	@Test
 	@DisplayName("Check if patterns are correctly test")
 	public void patternTest() {
-		
+
 		PatternManagerFactory patternManagerFactory = new PatternManagerFactory();
 		patternManager = patternManagerFactory.getPatternManager("SIMPLE_PATTERN_MANAGER");
-		
-		// Manage TSV
-		String filePath = Path + "/biosql_detailedPLD.tsv";
 
-		File tsvFile = new File(filePath);
-		
-		loader = new SimpleLoader(tsvFile, "\t");
-		dataHandler = loader.load();
-		
 
 		
-		
-        
-		
-		// Load TSV file
 		mainController.load(originalFile);
 		mainController.fitDataToGroupPhaseMeasurements(
 				new ClusteringProfile(new BeatClusteringProfile(mainController.getNumberOfBeats()),
@@ -93,34 +72,25 @@ public class PatternsTest {
 		
 		List<Phase> phases = mainController.getPhases();
 		
-		List<PatternData> expectedPatternList = patternManager.getPatterns(observableList, phases);
+		List<PatternData> actualPatternList = patternManager.getPatterns(observableList, phases, Constants.PatternType.NO_TYPE);
 		
-				
-
-		List<Entity> actualEntities = dataHandler.getPopulation();
-		List<Beat> actualBeats = dataHandler.getTimeline();
-		
-		List<Entity> ascedingOrderEntityList = new ArrayList<Entity>();
-		for(ChartGroupPhaseMeasurement item : observableList) {
-			
-			ascedingOrderEntityList.add(item.getEntityGroup().getGroupComponents().get(0));
-		}
-		
-		
-		sortList(actualEntities,ascedingOrderEntityList);
-
-
-		
-		testBUDPatterns(actualEntities,actualBeats);
-		
-		testLadderPatterns();
-
-		 
+		initializeExpectedPatterns();
+		/*
+		 * System.out.println("\n"); System.out.println("Testt"); for (var pattern :
+		 * actualPatternList) { System.out.println(pattern.getPatternType().toString());
+		 * 
+		 * if (pattern.getPatternCellsList().size() > 0) { for (var item :
+		 * pattern.getPatternCellsList()) {
+		 * 
+		 * System.out.println("Entity Name : " + item.getEntityName() + " PhaseId: " +
+		 * item.getPhaseId());
+		 * 
+		 * } } System.out.println("\n"); }
+		 */
 		
 		for(int i = 0; i < actualPatternList.size(); i++){
 			PatternData expectedPatternData = expectedPatternList.get(i);
 			PatternData actualPatternData = actualPatternList.get(i);
-			
 			
 			Assertions.assertAll(
                     () -> Assertions.assertEquals(expectedPatternData.getPatternType(), actualPatternData.getPatternType()),
@@ -130,133 +100,10 @@ public class PatternsTest {
 
 	}
 	
-	//Test births, updates, deaths patterns
-	public void testBUDPatterns(List<Entity> actualEntities, List<Beat> actualBeats) {
-		
-		for(Beat beat: actualBeats) {
-			List<CellInfo> cellsMultipleBirths = new ArrayList<CellInfo>();
-			List<CellInfo> cellsMultipleDeaths = new ArrayList<CellInfo>();
-			List<CellInfo> cellsMultipleUpdates = new ArrayList<CellInfo>();
-			
-			int beatId = beat.getBeatId();
-			for(Entity entity: actualEntities) {
-				String entityName = entity.getEntityName();
-				List<IMeasurement> measurementsList = new ArrayList<IMeasurement>();
-				
-				if(beatId == 0) {
-    				TotalEntitiesNamesAscOrder.add(entityName);
-    			}
-
-				
-				
-				measurementsList = dataHandler.getTem(entity, beat).getMeasurements();
-				CellInfo cell;
-				
-				if(measurementsList != null) {
-					int measurementIndex = dataHandler.getTem(entity, beat).containsMeasurementType(measurementType, Constants.AggregationType.NO_AGGREGATION);
-					
-					IMeasurement measurement = new EmptyIMeasurement(Constants.GPMType.ACTIVE);
-					if (measurementIndex != -1) {							
-						measurement = dataHandler.getTem(entity, beat).getMeasurements().get(measurementIndex);
-                    }
-					cell = new CellInfo(entityName, beatId, measurement);
-					cellsMultipleUpdates.add(cell);
-				}
-
-				if(beatId == entity.getLifeDetails().getBirthBeatId()) {
-					cell = new CellInfo(entityName, beatId, null);
-					cellsMultipleBirths.add(cell);
-				}
-				else if(beatId == entity.getLifeDetails().getDeathBeatId() && entity.getLifeDetails().isAlive() == false){
-					cell = new CellInfo(entityName, beatId, null);
-					cellsMultipleDeaths.add(cell);
-				}
-
-			}
-			
-			PatternData patternMultipleBirths = new PatternData(Constants.PatternType.MULTIPLE_BIRTHS,cellsMultipleBirths);
-			PatternData patternMultipleUpdates = new PatternData(Constants.PatternType.MULTIPLE_UPDATES,cellsMultipleUpdates);
-    		PatternData patternMultipleDeaths = new PatternData(Constants.PatternType.MULTIPLE_DEATHS,cellsMultipleDeaths);
-			
-			
-			if(cellsMultipleBirths.size() > 3) {
-				actualPatternList.add(patternMultipleBirths);
-    			
-    		}
-			if(cellsMultipleUpdates.size() > 3){
-				actualPatternList.add(patternMultipleUpdates);
-    		}
-    		if(cellsMultipleDeaths.size() > 3){    			
-    			actualPatternList.add(patternMultipleDeaths);
-    		}
-    		
-    		
-    	
-    		//LAST BIRTH CELL AT EACH PHASE
-    		if(patternMultipleBirths.getPatternCellsList().size() > 0) {
-    			CellInfo ladderCell = patternMultipleBirths.getLastCellOfPattern();    			
-    			lastBirthCellsEachPhase.add(ladderCell);    
-    		}
-		}
-		
-	}
-	
-	//Test ladder patterns
-	public void testLadderPatterns() {
-		List<CellInfo> cellsLadderPattern = new ArrayList<CellInfo>();
-    	
-    	for(int i = 0; i < lastBirthCellsEachPhase.size() - 1;i++) {    		
-    		CellInfo currentCell = lastBirthCellsEachPhase.get(i);
-    		
-    		
-    		CellInfo nextCell = lastBirthCellsEachPhase.get(i+1);
-    		    		
-    		
-    		int currentCellPhaseId = lastBirthCellsEachPhase.get(i).getPhaseId();
-    		
-    		
-    		int difPhases1 = nextCell.getPhaseId() - currentCellPhaseId;
-    		
-    		
-    		//To achieve the Ladder pattern we need to arrange the table based on the ascending order of births, so we have to find the new position of the entities in the table.
-    		int currentCellEntityNameIndex = TotalEntitiesNamesAscOrder.indexOf(lastBirthCellsEachPhase.get(i).getEntityName());
-			int nextCellEntityNameIndex = TotalEntitiesNamesAscOrder.indexOf(lastBirthCellsEachPhase.get(i + 1).getEntityName());
-			
-			int difEntities1 = nextCellEntityNameIndex - currentCellEntityNameIndex;
-
-    		
-    		boolean ladderConnection = false;
-    		
-    		
-			if (difPhases1 <= 3 && difEntities1 <= 3 ) {
-				
-				cellsLadderPattern.add(currentCell);
-				cellsLadderPattern.add(nextCell);
-				ladderConnection = true;
-			}
-			if(ladderConnection == false) {
-				List<CellInfo> distinctCellsLadderPattern = cellsLadderPattern.stream().distinct().collect(Collectors.toList());
-				if(distinctCellsLadderPattern.size() >= 3) {
-					PatternData patternLadder = new PatternData(Constants.PatternType.LADDER, distinctCellsLadderPattern);
-					actualPatternList.add(patternLadder);
-
-				}
-				
-				cellsLadderPattern = new ArrayList<CellInfo>();
-				
-			}
-    	}
-    	List<CellInfo> distinctCellsLadderPattern = cellsLadderPattern.stream().distinct().collect(Collectors.toList());
-    	if(distinctCellsLadderPattern.size() >= 3) {
-			PatternData patternLadder = new PatternData(Constants.PatternType.LADDER, distinctCellsLadderPattern);
-			actualPatternList.add(patternLadder);
-
-		}
-	}
 	
 	public void testCellsList(List<CellInfo> expectedCells, List<CellInfo> actualCells) {
 		Assumptions.assumeTrue(expectedCells.size() == actualCells.size());
-
+		
         for (int i=0; i < expectedCells.size(); i++) {
         	CellInfo expectedCell = expectedCells.get(i);
         	CellInfo actualCell = actualCells.get(i);
@@ -268,49 +115,216 @@ public class PatternsTest {
 	public void testCell(CellInfo expectedCell, CellInfo actualCell) {
         Assertions.assertAll(
                 () -> Assertions.assertEquals(expectedCell.getPhaseId(), actualCell.getPhaseId()),
-                () -> Assertions.assertEquals(expectedCell.getEntityName(), actualCell.getEntityName()),
-                () -> testCellMeasurement(expectedCell.getMeasurement(), actualCell.getMeasurement())
+                () -> Assertions.assertEquals(expectedCell.getEntityName(), actualCell.getEntityName())
         );
     }
 	
-	public void testCellMeasurement(IMeasurement expectedMeasurement, IMeasurement actualMeasurement) {
-		Double expectedVal = expectedMeasurement != null ? expectedMeasurement.getValue() : null;
-		Double actualVal = actualMeasurement != null ? actualMeasurement.getValue() : null;
+	
+	//The initialization is based on _threshold = 3, if that change the data should change too
+	public void initializeExpectedPatterns() {
+    	List<CellInfo> expected_multiple_Births1 = new ArrayList<CellInfo>() {{
+    		add(new CellInfo("biodatabase", 0));
+    		add(new CellInfo("bioentry", 0));
+    		add(new CellInfo("bioentry_date", 0));
+    		add(new CellInfo("bioentry_description", 0));
+    		add(new CellInfo("bioentry_direct_links", 0));
+    		add(new CellInfo("bioentry_keywords", 0));
+    		add(new CellInfo("bioentry_reference", 0));
+    		add(new CellInfo("bioentry_taxa", 0));
+    		add(new CellInfo("biosequence", 0));
+    		add(new CellInfo("cache_corba_support", 0));
+    		add(new CellInfo("comment", 0));
+    		add(new CellInfo("location_qualifier_value", 0));
+    		add(new CellInfo("reference", 0));
+    		add(new CellInfo("remote_seqfeature_name", 0));
+    		add(new CellInfo("seqfeature", 0));
+    		add(new CellInfo("seqfeature_key", 0));
+    		add(new CellInfo("seqfeature_location", 0));
+    		add(new CellInfo("seqfeature_qualifier", 0));
+    		add(new CellInfo("seqfeature_qualifier_value", 0));
+    		add(new CellInfo("seqfeature_source", 0));
+    		add(new CellInfo("taxa", 0));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_BIRTHS,expected_multiple_Births1);
+        
+        expectedPatternList.add(patternData);
+        
+        
+        List<CellInfo> expected_multiple_Deaths = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("bioentry_date", 2));
+    		add(new CellInfo("bioentry_description", 2));
+    		add(new CellInfo("bioentry_keywords", 2));
+    		add(new CellInfo("seqfeature_key", 2));
+    		add(new CellInfo("seqfeature_qualifier", 2));
+        }};
+        
+        
+        patternData = new PatternData(PatternType.MULTIPLE_DEATHS,expected_multiple_Deaths);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Births2 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("bioentry_qualifier_value", 3));
+        	add(new CellInfo("dbxref", 3));
+        	add(new CellInfo("dbxref_qualifier_value", 3));
+        	add(new CellInfo("ontology_term", 3));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_BIRTHS,expected_multiple_Births2);
+        expectedPatternList.add(patternData);
+        
 
-    	Assertions.assertEquals(expectedVal, actualVal);
+        
+        List<CellInfo> expected_multiple_Updates1 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("bioentry_direct_links", 3));
+        	add(new CellInfo("biosequence", 3));
+    		add(new CellInfo("location_qualifier_value", 3));
+    		add(new CellInfo("reference", 3));
+    		add(new CellInfo("seqfeature_qualifier_value", 3));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates1);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Updates2 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("bioentry", 10));
+        	add(new CellInfo("bioentry_reference", 10));
+        	add(new CellInfo("biosequence", 10));
+        	add(new CellInfo("comment", 10));
+        	add(new CellInfo("location_qualifier_value", 10));
+        	add(new CellInfo("reference", 10));
+        	add(new CellInfo("remote_seqfeature_name", 10));
+        	add(new CellInfo("seqfeature", 10));
+        	add(new CellInfo("seqfeature_location", 10));
+            add(new CellInfo("seqfeature_qualifier_value", 10));
+            add(new CellInfo("bioentry_qualifier_value", 10));
+            add(new CellInfo("dbxref_qualifier_value", 10));
+            add(new CellInfo("ontology_term", 10));
+            add(new CellInfo("seqfeature_relationship", 10));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates2);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Births3 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("ontology", 21));
+    		add(new CellInfo("ontology_dbxref", 21));
+    		add(new CellInfo("ontology_path", 21));
+    		add(new CellInfo("ontology_relationship", 21));
+    		add(new CellInfo("taxon_name", 21));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_BIRTHS,expected_multiple_Births3);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Updates3 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("bioentry",21));
+        	add(new CellInfo("bioentry_reference", 21));
+        	add(new CellInfo("biosequence", 21));
+        	add(new CellInfo("comment",21));
+        	add(new CellInfo("location_qualifier_value", 21));
+        	add(new CellInfo("reference", 21));
+        	add(new CellInfo("seqfeature", 21));
+        	add(new CellInfo("seqfeature_location", 21));
+        	add(new CellInfo("seqfeature_qualifier_value", 21));
+        	add(new CellInfo("bioentry_qualifier_value", 21));
+        	add(new CellInfo("dbxref", 21));
+            add(new CellInfo("dbxref_qualifier_value",21));
+            add(new CellInfo("ontology_term", 21));
+            add(new CellInfo("seqfeature_relationship", 21));
+            add(new CellInfo("taxon", 21));
+            add(new CellInfo("bioentry_relationship", 21));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates3);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Updates4 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("biodatabase", 23));
+        	add(new CellInfo("bioentry", 23));
+        	add(new CellInfo("biosequence", 23));
+        	add(new CellInfo("seqfeature", 23));
+        	add(new CellInfo("taxon", 23));
+        	add(new CellInfo("taxon_name", 23));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates4);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Updates5 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("biosequence", 24));
+        	add(new CellInfo("dbxref_qualifier_value", 24));
+        	add(new CellInfo("ontology_relationship", 24));
+        	add(new CellInfo("bioentry_dbxref", 24));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates5);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Updates6 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("location_qualifier_value", 27));
+        	add(new CellInfo("seqfeature_qualifier_value", 27));
+        	add(new CellInfo("bioentry_qualifier_value", 27));
+        	add(new CellInfo("dbxref_qualifier_value", 27));
+        	add(new CellInfo("seqfeature_relationship", 27));
+        	add(new CellInfo("bioentry_relationship", 27));
+        	add(new CellInfo("bioentry_path", 27));
+        	add(new CellInfo("seqfeature_path", 27));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates6);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_multiple_Updates7 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("seqfeature_relationship", 33));
+        	add(new CellInfo("bioentry_relationship", 33));
+        	add(new CellInfo("bioentry_path", 33));
+        	add(new CellInfo("seqfeature_path", 33));
+        }};
+        patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates7);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_ladder1 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("biodatabase", 0));
+        	add(new CellInfo("bioentry", 0));
+        	add(new CellInfo("bioentry_date", 0));
+        	add(new CellInfo("bioentry_description", 0));
+        	add(new CellInfo("bioentry_direct_links", 0));
+        	add(new CellInfo("bioentry_keywords", 0));
+        	add(new CellInfo("bioentry_reference", 0));
+        	add(new CellInfo("bioentry_taxa", 0));
+        	add(new CellInfo("biosequence", 0));
+        	add(new CellInfo("cache_corba_support", 0));
+        	add(new CellInfo("comment", 0));
+        	add(new CellInfo("location_qualifier_value", 0));
+        	add(new CellInfo("reference", 0));
+        	add(new CellInfo("remote_seqfeature_name", 0));
+        	add(new CellInfo("seqfeature", 0));
+        	add(new CellInfo("seqfeature_key", 0));
+        	add(new CellInfo("seqfeature_location", 0));
+        	add(new CellInfo("seqfeature_qualifier", 0));
+        	add(new CellInfo("seqfeature_qualifier_value", 0));
+        	add(new CellInfo("seqfeature_source", 0));
+        	add(new CellInfo("taxa", 0));
+        	add(new CellInfo("bioentry_qualifier_value", 3));
+        	add(new CellInfo("dbxref", 3));
+        	add(new CellInfo("dbxref_qualifier_value", 3));
+        	add(new CellInfo("ontology_term", 3));
+        	add(new CellInfo("seqfeature_relationship", 5));
+        }};
+        patternData = new PatternData(PatternType.LADDER,expected_ladder1);
+        expectedPatternList.add(patternData);
+        
+        List<CellInfo> expected_ladder2 = new ArrayList<CellInfo>() {{
+        	add(new CellInfo("ontology", 21));
+        	add(new CellInfo("ontology_dbxref", 21));
+        	add(new CellInfo("ontology_path", 21));
+        	add(new CellInfo("ontology_relationship", 21));
+        	add(new CellInfo("taxon_name", 21));
+        	add(new CellInfo("bioentry_dbxref", 23));
+        	add(new CellInfo("bioentry_path", 24));
+        	add(new CellInfo("seqfeature_path", 24));
+        	add(new CellInfo("seqfeature_dbxref", 26));
+        	add(new CellInfo("location", 27));
+        	add(new CellInfo("term", 27));
+        	add(new CellInfo("term_dbxref", 27));
+        	add(new CellInfo("term_path", 28));
+        	add(new CellInfo("term_relationship", 28));
+        	add(new CellInfo("term_synonym", 29));
+        }};
+        patternData = new PatternData(PatternType.LADDER,expected_ladder2);
+        expectedPatternList.add(patternData);
+
     }
-	
-	
-	
-	
-	//There isn't a way to sort .tsv file, so we order entities like the list we pass as parameter to getPatterns method 
-	//This method orders a list of Entities the same way as the other Entities list by entity name
-	public static void sortList(List<Entity> objectsToOrder, List<Entity> orderedObjects) {
-
-		HashMap<String, Integer> indexMap = new HashMap<>();
-	    int index = 0;
-	    for (Entity object : orderedObjects) {
-	        indexMap.put(object.getEntityName(), index);
-	        index++;
-	    }
-
-	    Collections.sort(objectsToOrder, new Comparator<Entity>() {
-
-	    	
-	        public int compare(Entity left, Entity right) {
-
-	            Integer leftIndex = indexMap.get(left.getEntityName());
-	            Integer rightIndex = indexMap.get(right.getEntityName());
-	            if (leftIndex == null) {
-	                return -1;
-	            }
-	            if (rightIndex == null) {
-	                return 1;
-	            }
-
-	            return Integer.compare(leftIndex, rightIndex);
-	        }
-	    });
-	}
-	
 }

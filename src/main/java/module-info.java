@@ -4,6 +4,7 @@ module PloutarchParallelLives {
     requires javafx.base;
     requires javafx.swing;
 	requires java.desktop;
+	requires javafx.graphics;
 
     opens daintiness.gui;
 }

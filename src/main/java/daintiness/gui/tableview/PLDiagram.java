@@ -26,9 +26,12 @@ import java.util.List;
 import daintiness.clustering.EntityGroup;
 import daintiness.clustering.Phase;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
+import daintiness.models.CellInfo;
+import daintiness.models.PatternData;
 import daintiness.models.measurement.EmptyIMeasurement;
 import daintiness.models.measurement.IMeasurement;
 import daintiness.utilities.Constants;
+import daintiness.utilities.Constants.PatternType;
 
 public class PLDiagram extends ScrollPane {
 	private /* final */ Group group;
@@ -53,12 +56,14 @@ public class PLDiagram extends ScrollPane {
     private JTable table;
     private SwingNode swingNode;
     private DefaultTableModel tableModel;
+    private List<PatternData> patternList;
     
 
     public PLDiagram(ObservableList<ChartGroupPhaseMeasurement> observableList,
-                     List<Phase> phases) {
+                     List<Phase> phases, List<PatternData> patternList) {
         super();
 		
+        this.patternList = patternList;
 		group = new Group(); 
         createJTable(observableList, phases);
 		
@@ -145,11 +150,9 @@ public class PLDiagram extends ScrollPane {
         	
         	
         	ChartGroupPhaseMeasurement val = (ChartGroupPhaseMeasurement)value;
-        	
+        	EntityGroup entityGroup = val.getEntityGroup();
+    		String entityGroupName = null;
         	if(column == 0) {
-        		EntityGroup entityGroup = val.getEntityGroup();
-        		String entityGroupName = null;
-
         		if (entityGroup != null) {
     				if (entityGroup.getGroupComponents().size() == 1) {
     					entityGroupName = entityGroup.getGroupComponents().get(0).getEntityName();
@@ -197,6 +200,35 @@ public class PLDiagram extends ScrollPane {
             					setValue("");
         					}
         				}
+    				}
+    				
+    				if(patternList != null) {
+    					for(PatternData pattern: patternList) {
+							for(CellInfo cell: pattern.getPatternCellsList()) {
+								
+								if (pattern.getPatternType() == PatternType.MULTIPLE_BIRTHS && cell
+										.getEntityName() == entityGroup.getGroupComponents().get(0).getEntityName()
+										&& cell.getPhaseId() == phaseId) {
+									setBackground(java.awt.Color.WHITE);
+								}
+								else if (pattern.getPatternType() == PatternType.MULTIPLE_UPDATES && cell
+										.getEntityName() == entityGroup.getGroupComponents().get(0).getEntityName()
+										&& cell.getPhaseId() == phaseId) {
+									setBackground(java.awt.Color.ORANGE);
+								}
+								else if (pattern.getPatternType() == PatternType.MULTIPLE_DEATHS && cell
+										.getEntityName() == entityGroup.getGroupComponents().get(0).getEntityName()
+										&& cell.getPhaseId() == phaseId) {
+									setBackground(java.awt.Color.RED);
+								}
+								 
+								else if (pattern.getPatternType() == PatternType.LADDER && cell
+										.getEntityName() == entityGroup.getGroupComponents().get(0).getEntityName()
+										&& cell.getPhaseId() == phaseId) {
+									setBackground(java.awt.Color.MAGENTA);
+								}
+							}    						
+    					}
     				}
         		}
         	}
