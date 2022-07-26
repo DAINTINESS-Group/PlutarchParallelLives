@@ -1,4 +1,4 @@
-package daintiness.patterns;
+package daintiness.patterns.patternAlgos;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,6 +20,8 @@ import daintiness.io.input.ILoader;
 import daintiness.maincontroller.MainController;
 import daintiness.models.CellInfo;
 import daintiness.models.PatternData;
+import daintiness.patterns.IPatternManager;
+import daintiness.patterns.PatternManagerFactory;
 import daintiness.utilities.Constants;
 import daintiness.utilities.Constants.PatternType;
 import javafx.collections.ObservableList;
