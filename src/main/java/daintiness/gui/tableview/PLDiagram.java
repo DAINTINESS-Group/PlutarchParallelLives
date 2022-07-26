@@ -209,7 +209,7 @@ public class PLDiagram extends ScrollPane {
 								if (pattern.getPatternType() == PatternType.MULTIPLE_BIRTHS && cell
 										.getEntityName() == entityGroup.getGroupComponents().get(0).getEntityName()
 										&& cell.getPhaseId() == phaseId) {
-									setBackground(java.awt.Color.WHITE);
+									setBackground(java.awt.Color.BLUE);
 								}
 								else if (pattern.getPatternType() == PatternType.MULTIPLE_UPDATES && cell
 										.getEntityName() == entityGroup.getGroupComponents().get(0).getEntityName()

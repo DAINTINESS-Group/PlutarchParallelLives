@@ -107,6 +107,8 @@ public class Controller {
     private IMainController mainController;
 
     private final File initialDirectory = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "data");
+    
+    private final File initialPatternsDirectory = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns");
 
     private PLDiagram pld;
     
@@ -571,39 +573,52 @@ public class Controller {
     public void showAllPatterns() {
     	
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
-    	
-    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.NO_TYPE);
-    	createJFrameHighlightedPatterns(patternList);
-    	
+    	File selectedFile = choosePatternSave();
+    	if(selectedFile != null) {
+    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.NO_TYPE,selectedFile);
+        	createJFrameHighlightedPatterns(patternList);
+    	}
     }
     @FXML
     public void showBirthsPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
     	
-    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_BIRTHS);
-    	createJFrameHighlightedPatterns(patternList);
-    	
+    	File selectedFile = choosePatternSave();
+    	if(selectedFile != null) {
+    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_BIRTHS, selectedFile);
+        	createJFrameHighlightedPatterns(patternList);
+    	}
+
     }
     @FXML
     public void showUpdatesPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
     	
-    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_UPDATES);
-    	createJFrameHighlightedPatterns(patternList);
+    	File selectedFile = choosePatternSave();
+    	if(selectedFile != null) {
+    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_UPDATES, selectedFile);
+        	createJFrameHighlightedPatterns(patternList);
+    	}
     }
     @FXML
     public void showDeathsPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
-    	
-    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_DEATHS);
-    	createJFrameHighlightedPatterns(patternList);
+
+    	File selectedFile = choosePatternSave();
+    	if(selectedFile != null) {
+    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_DEATHS, selectedFile);
+        	createJFrameHighlightedPatterns(patternList);
+    	}
     }
     @FXML
     public void showLadderPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
-    	
-    	List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.LADDER);
-    	createJFrameHighlightedPatterns(patternList);
+
+    	File selectedFile = choosePatternSave();
+    	if(selectedFile != null) {
+    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.LADDER, selectedFile);
+        	createJFrameHighlightedPatterns(patternList);
+    	}
     }
     
     private void createJFrameHighlightedPatterns(List<PatternData> patternList) {
@@ -623,5 +638,19 @@ public class Controller {
         frame.setSize(new Dimension(600,600));
         frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+    }
+    
+   
+    private File choosePatternSave() {
+    	FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save patterns as .txt file");
+        if (!initialPatternsDirectory.exists()) {
+        	initialPatternsDirectory.mkdirs();
+		}
+        chooser.setInitialDirectory(initialPatternsDirectory);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(".txt", "*.txt"));
+        File selectedFile = chooser.showSaveDialog(borderPane.getScene().getWindow());
+
+        return selectedFile;
     }
 }

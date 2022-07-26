@@ -164,7 +164,7 @@ public class MainController implements IMainController {
     
     
     @Override
-    public List<PatternData> getPatterns(PatternType patternType) {
+    public List<PatternData> getPatterns(PatternType patternType, File file) {
     	if(totalPatternList.isEmpty() || fileHasChanged || (patternType != previousPatternType)) {
     		PatternManagerFactory patternManagerFactory = new PatternManagerFactory();
         	patternManager = patternManagerFactory.getPatternManager("SIMPLE_PATTERN_MANAGER");
@@ -176,7 +176,7 @@ public class MainController implements IMainController {
     	}
     	fileHasChanged = false;
     	previousPatternType = patternType;    			
-    	patternManager.printPatterns(totalPatternList, patternType.toString(), selectedFile.getName());
+    	patternManager.printPatterns(totalPatternList, patternType.toString(), selectedFile.getName(), file);
     	return totalPatternList;
     }
 }

@@ -1,5 +1,6 @@
 package daintiness.patterns;
 
+import java.io.File;
 import java.util.List;
 
 import daintiness.clustering.Phase;
@@ -13,5 +14,5 @@ public interface IPatternManager {
 
 	List<PatternData> getPatterns(ObservableList<ChartGroupPhaseMeasurement> totalValues, List<Phase> phases, PatternType patternType);
 	
-	void printPatterns(List<PatternData> patternDataList, String patternTypeString, String fileNameString);
+	void printPatterns(List<PatternData> patternDataList, String patternTypeString, String fileNameString, File file);
 }

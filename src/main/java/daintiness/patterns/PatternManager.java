@@ -31,18 +31,20 @@ public class PatternManager implements IPatternManager {
         return patternList;
 	}
 
-	public void printPatterns(List<PatternData> patternList, String patternTypeString, String fileNameString) {
+	public void printPatterns(List<PatternData> patternList, String patternTypeString, String fileNameString, File file) {
 		try {
-			String directoryPath = "src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns";
 			
-			File directory = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns");
-			if (!directory.exists()) {
-				directory.mkdirs();
+			if(file == null) {
+				File directory = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns");
+				if (!directory.exists()) {
+					directory.mkdirs();
+				}
+						
+				
+				String fileName = patternTypeString + "_" + fileNameString + ".txt";
+				file = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns" +  Constants.FS + fileName);
+				
 			}
-					
-			
-			String fileName = patternTypeString + "_" + fileNameString + ".txt";
-			File file = new File("src" + Constants.FS + "main" + Constants.FS + "resources" + Constants.FS + "SavedPatterns" +  Constants.FS + fileName);
 			FileWriter fileWriter = new FileWriter(file);
 			for (var pattern : patternList) {
 				//System.out.println(pattern.getPatternType().toString());
