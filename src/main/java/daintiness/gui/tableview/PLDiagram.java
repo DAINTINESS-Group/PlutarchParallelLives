@@ -115,24 +115,28 @@ public class PLDiagram extends ScrollPane {
 		}
 
 		table.setDefaultRenderer(Object.class, new PaintTableCellRenderer());
-     	
+		table.setPreferredScrollableViewportSize(
+			    new Dimension(
+			        table.getPreferredSize().width + 1,
+			        table.getRowHeight() *  (observableList.size() + 2)));
 
 		jScrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		//Table size
 		int tableWidth = (phases.size() * cellWidth) + firstColumnWidth;
         int tableHeight = observableList.size() * cellWidth;
-        Dimension tableDimensions = new Dimension();
-        tableDimensions.setSize(tableWidth * 1.1, tableHeight);
-        jScrollPane.setPreferredSize(tableDimensions);
+        //Dimension tableDimensions = new Dimension();
+        //tableDimensions.setSize(tableWidth * 1.1, tableHeight);
+        //jScrollPane.setPreferredSize(tableDimensions);
 		
 		
         
         swingNode = new SwingNode();
         swingNode.setContent(jScrollPane);
+
         group.getChildren().add(swingNode);
-        group.prefHeight(900);
-        group.prefWidth(900);
+        //group.prefHeight(900);
+        //group.prefWidth(900);
         setContent(group);
         
         enableZoomJTable(swingNode,Double.valueOf(tableWidth),Double.valueOf(tableHeight));

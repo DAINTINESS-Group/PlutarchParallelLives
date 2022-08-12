@@ -36,15 +36,17 @@
 
                 </Menu>
                 <Menu fx:id="PatternsMenu" text="Patterns">
-                    <MenuItem fx:id="showBirthsPatterns" text="Show and Save Births Patterns" onAction="#showBirthsPatterns"/>
-                                        
-                    <MenuItem fx:id="showUpdatesPatterns" text="Show and Save Updates Patterns" onAction="#showUpdatesPatterns"/>
-                    
-                    <MenuItem fx:id="showDeathsPatterns" text="Show and Save Deaths Patterns" onAction="#showDeathsPatterns"/>
-                    
-                    <MenuItem fx:id="showLadderPatterns" text="Show and Save Ladder Patterns" onAction="#showLadderPatterns"/>
-                    
-                    <MenuItem fx:id="showAllPatterns" text="Show and Save All Patterns" onAction="#showAllPatterns"/>
+	                <Menu fx:id="PatternsMenu" text="Show patterns and save the data">
+	                    <MenuItem fx:id="showBirthsPatterns" text="Births Patterns" onAction="#showBirthsPatterns"/>
+	                                        
+	                    <MenuItem fx:id="showUpdatesPatterns" text="Updates Patterns" onAction="#showUpdatesPatterns"/>
+	                    
+	                    <MenuItem fx:id="showDeathsPatterns" text="Deaths Patterns" onAction="#showDeathsPatterns"/>
+	                    
+	                    <MenuItem fx:id="showLadderPatterns" text="Ladder Patterns" onAction="#showLadderPatterns"/>
+	                    
+	                    <MenuItem fx:id="showAllPatterns" text="All Patterns" onAction="#showAllPatterns"/>
+	                </Menu>
                 </Menu>
             </MenuBar>
         </VBox>
