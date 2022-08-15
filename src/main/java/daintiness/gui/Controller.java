@@ -100,6 +100,9 @@ public class Controller {
     private MenuItem showLadderPatterns;
     @FXML
     private MenuItem showAllPatterns;
+    
+    @FXML
+    private MenuItem savePatternsReport;
 
 
     private HBox pldButtonBar;
@@ -224,6 +227,7 @@ public class Controller {
                 exportProjectMenuItem.setDisable(true);
                 closePLDMenuItem.setDisable(true);
                 PatternsMenu.setDisable(true);
+                savePatternsReport.setDisable(true);
                 break;
             case DATA_NO_PLD:
                 sortingOptions.setDisable(false);
@@ -235,6 +239,7 @@ public class Controller {
                 showPLDMenuItem.setDisable(false);
                 exportProjectMenuItem.setDisable(false);
                 PatternsMenu.setDisable(false);
+                savePatternsReport.setDisable(true);
                 break;
             case PLD:
                 screenShotMenuItem.setDisable(false);
@@ -242,6 +247,7 @@ public class Controller {
                 showPLDMenuItem.setDisable(true);
                 closePLDMenuItem.setDisable(false);
                 PatternsMenu.setDisable(false);
+                savePatternsReport.setDisable(true);
                 break;
             default:
         }
@@ -573,51 +579,48 @@ public class Controller {
     public void showAllPatterns() {
     	
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
-    	File selectedFile = choosePatternSave();
-    	if(selectedFile != null) {
-    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.NO_TYPE,selectedFile);
-        	createJFrameHighlightedPatterns(patternList);
-    	}
+		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.NO_TYPE);
+    	createJFrameHighlightedPatterns(patternList);
     }
     @FXML
     public void showBirthsPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
     	
-    	File selectedFile = choosePatternSave();
-    	if(selectedFile != null) {
-    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_BIRTHS, selectedFile);
-        	createJFrameHighlightedPatterns(patternList);
-    	}
+    	
+		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_BIRTHS);
+    	createJFrameHighlightedPatterns(patternList);
+    	
 
     }
     @FXML
     public void showUpdatesPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
     	
-    	File selectedFile = choosePatternSave();
-    	if(selectedFile != null) {
-    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_UPDATES, selectedFile);
-        	createJFrameHighlightedPatterns(patternList);
-    	}
+		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_UPDATES);
+    	createJFrameHighlightedPatterns(patternList);
+    	
     }
     @FXML
     public void showDeathsPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
 
-    	File selectedFile = choosePatternSave();
-    	if(selectedFile != null) {
-    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_DEATHS, selectedFile);
-        	createJFrameHighlightedPatterns(patternList);
-    	}
+		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.MULTIPLE_DEATHS);
+    	createJFrameHighlightedPatterns(patternList);
+    	
     }
     @FXML
     public void showLadderPatterns() {
     	mainController.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
 
+		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.LADDER);
+    	createJFrameHighlightedPatterns(patternList);
+    }
+    
+    @FXML
+    public void savePatternsReport() {
     	File selectedFile = choosePatternSave();
     	if(selectedFile != null) {
-    		List<PatternData> patternList = mainController.getPatterns(Constants.PatternType.LADDER, selectedFile);
-        	createJFrameHighlightedPatterns(patternList);
+    		mainController.printPatterns(selectedFile);
     	}
     }
     
@@ -638,6 +641,7 @@ public class Controller {
         frame.setSize(new Dimension(600,600));
         frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		savePatternsReport.setDisable(false);
     }
     
    

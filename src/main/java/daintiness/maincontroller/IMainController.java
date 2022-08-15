@@ -171,5 +171,7 @@ public interface IMainController {
 
 
 
-	List<PatternData> getPatterns(PatternType patternType, File outputFile);
+	List<PatternData> getPatterns(PatternType patternType);
+	
+	void printPatterns(File outputFile);
 }

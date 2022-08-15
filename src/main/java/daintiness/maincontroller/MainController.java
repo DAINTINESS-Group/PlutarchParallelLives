@@ -164,19 +164,25 @@ public class MainController implements IMainController {
     
     
     @Override
-    public List<PatternData> getPatterns(PatternType patternType, File file) {
+    public List<PatternData> getPatterns(PatternType patternType) {
     	if(totalPatternList.isEmpty() || fileHasChanged || (patternType != previousPatternType)) {
     		PatternManagerFactory patternManagerFactory = new PatternManagerFactory();
         	patternManager = patternManagerFactory.getPatternManager("SIMPLE_PATTERN_MANAGER");
 
-        	//clusteringHandler.sortChartData(Constants.SortingType.BIRTH_ASCENDING);
+        	
         	ObservableList<ChartGroupPhaseMeasurement> TotalValues = clusteringHandler.getChartData();
         	List<Phase> TotalPhases = clusteringHandler.getPhases();
         	totalPatternList = patternManager.getPatterns(TotalValues, TotalPhases, patternType);
     	}
     	fileHasChanged = false;
     	previousPatternType = patternType;    			
-    	patternManager.printPatterns(totalPatternList, patternType.toString(), selectedFile.getName(), file);
+    	//patternManager.printPatterns(totalPatternList, patternType.toString(), selectedFile.getName(), file);
     	return totalPatternList;
+    }
+    
+    @Override
+    public void printPatterns(File file) {
+    	
+    	patternManager.printPatterns(totalPatternList, file);
     }
 }
