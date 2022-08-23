@@ -35,7 +35,17 @@
                     <MenuItem fx:id="closePLDMenuItem" text="Close PLD" onAction="#closePLD"/>
 
                 </Menu>
-                <Menu fx:id="PatternsMenu" text="Patterns">
+                <Menu text="Available Clustering Τypes">
+	                <Menu fx:id="MeasurementTypes" text="Measurement Types">
+	                    
+	                </Menu>
+	                <Menu fx:id="AggregationTypes" text="Aggregation Types">
+	                    
+	                </Menu>
+	                
+	                <MenuItem fx:id="ConfirmTypesChange" text="Confirm types change" onAction="#confirmTypeChanges"/>
+                </Menu>
+                <Menu text="Patterns">
 	                <Menu fx:id="PatternsMenu" text="Show patterns">
 	                    <MenuItem fx:id="showBirthsPatterns" text="Births Patterns" onAction="#showBirthsPatterns"/>
 	                                        

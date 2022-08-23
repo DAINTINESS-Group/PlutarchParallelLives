@@ -14,5 +14,5 @@ public interface IPatternManager {
 
 	List<PatternData> getPatterns(ObservableList<ChartGroupPhaseMeasurement> totalValues, List<Phase> phases, PatternType patternType);
 	
-	void printPatterns(List<PatternData> patternDataList, File file);
+	void printPatterns(List<PatternData> patternDataList, File file, String projectName);
 }

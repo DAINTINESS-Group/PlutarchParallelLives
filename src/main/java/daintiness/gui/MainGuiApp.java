@@ -22,7 +22,8 @@ public class MainGuiApp extends Application {
         Pane root = (Pane)fxmlLoader.load();
         root.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
         primaryStage.setTitle("Ploutarch Parallel Lives");
-        primaryStage.setScene(new Scene(root, 800, 500));
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 

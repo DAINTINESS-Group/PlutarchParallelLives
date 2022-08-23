@@ -183,6 +183,6 @@ public class MainController implements IMainController {
     @Override
     public void printPatterns(File file) {
     	
-    	patternManager.printPatterns(totalPatternList, file);
+    	patternManager.printPatterns(totalPatternList, file, selectedFile.getName());
     }
 }

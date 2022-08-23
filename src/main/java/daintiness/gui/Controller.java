@@ -10,7 +10,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
@@ -25,7 +24,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JTable;
 
 import daintiness.clustering.ClusteringProfile;
-import daintiness.clustering.EntityGroup;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 import daintiness.gui.details.EntityGroupDetails;
 import daintiness.gui.details.PhaseDetails;
@@ -35,10 +33,8 @@ import daintiness.gui.tableview.PLDiagram;
 import daintiness.maincontroller.IMainController;
 import daintiness.maincontroller.MainControllerFactory;
 import daintiness.models.PatternData;
-import daintiness.models.measurement.IMeasurement;
 import daintiness.utilities.Constants;
 
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -103,7 +99,14 @@ public class Controller {
     
     @FXML
     private MenuItem savePatternsReport;
-
+    
+    @FXML
+    private MenuItem ConfirmTypesChange;
+    
+    @FXML
+    private Menu MeasurementTypes;
+    @FXML
+    private Menu AggregationTypes;
 
     private HBox pldButtonBar;
 
@@ -125,7 +128,7 @@ public class Controller {
     private EntityGroupDetails entityGroupDetailsScrollPane;
     private PhaseDetails phaseDetailsScrollPane;
 
-    private int maTypesSizeWithoutDetails;
+    //private int maTypesSizeWithoutDetails;
 
     private Constants.MeasurementType measurementType;
     private Constants.AggregationType aggregationType;
@@ -140,9 +143,10 @@ public class Controller {
         mainController = factory.getMainController("SIMPLE_MAIN_CONTROLLER");
         enableButtons(GuiCondition.NO_DATA);
         selectionHasChangedListener = (observable, oldValue, newValue) -> {
-            if (maTypes.getChildren().size() > maTypesSizeWithoutDetails) {
-                maTypes.getChildren().remove(maTypesSizeWithoutDetails);
-            }
+			/*
+			 * if (maTypes.getChildren().size() > maTypesSizeWithoutDetails) {
+			 * //maTypes.getChildren().remove(maTypesSizeWithoutDetails); }
+			 */
             switch (selectedCellTypeProperty.get()) {
                 case PHASE:
                     phaseDetailsScrollPane = new PhaseDetails(pld.getSelectedPhase());
@@ -182,6 +186,65 @@ public class Controller {
         pldButtonBar.setAlignment(Pos.CENTER_RIGHT);
         pldButtonBar.getChildren().add(screenShotButton);
         pldButtonBar.getChildren().add(closePLDButton);
+        
+        //MeasurementTypes.getItems().clear();
+        //AggregationTypes.getItems().clear();
+        
+    }
+    
+    @FXML 
+    public void initalizeClusterTypes() {
+    	MeasurementTypes.getItems().clear();
+        AggregationTypes.getItems().clear();
+        
+        RadioMenuItem measurementMenuItem;
+        RadioMenuItem aggregationMenuItem;
+        //MenuItem ConfirmSettingsMenuItem = new MenuItem("Confirm changes");
+        
+        ToggleGroup tgMeasurement = new ToggleGroup();
+        ToggleGroup tgAggregation = new ToggleGroup();
+        
+        //=========================================================================
+        
+
+        for (Constants.MeasurementType tmpMeasurementType: mainController.getAvailableMeasurementTypesList()){
+        	
+        	measurementMenuItem = new RadioMenuItem(String.valueOf(tmpMeasurementType)); 
+        	measurementMenuItem.setOnAction(event -> measurementType = tmpMeasurementType);
+        	
+        	MeasurementTypes.getItems().add(measurementMenuItem);
+        	
+        	measurementMenuItem.setToggleGroup(tgMeasurement);
+        	
+        	if (mainController.getMeasurementType() == tmpMeasurementType) {
+        		measurementMenuItem.setSelected(true);
+                measurementType = tmpMeasurementType;
+            }
+        }
+        
+        for (Constants.AggregationType tmpAggregationType: mainController.getAvailableAggregationTypesList()){
+        	
+        	aggregationMenuItem = new RadioMenuItem(String.valueOf(tmpAggregationType)); 
+        	aggregationMenuItem.setOnAction(event -> aggregationType = tmpAggregationType);
+        	
+        	AggregationTypes.getItems().add(aggregationMenuItem);
+        	
+        	aggregationMenuItem.setToggleGroup(tgAggregation);
+        	
+        	if (mainController.getAggregationType() == tmpAggregationType) {
+        		aggregationMenuItem.setSelected(true);
+        		aggregationType= tmpAggregationType;
+            }
+        }
+    }
+    
+    @FXML
+    public void confirmTypeChanges() {
+
+    	mainController.generateChartDataOfType(measurementType, aggregationType);
+		showPLDAfterSettingsChange();
+    	
+
     }
 
     @FXML
@@ -200,6 +263,7 @@ public class Controller {
             mainController.load(selectedFile);
             showClusteringDialog();
         }
+        initalizeClusterTypes();
     }
 
     @FXML
@@ -213,6 +277,8 @@ public class Controller {
             mainController.load(selectedDirectory);
             showClusteringDialog();
         }
+        initalizeClusterTypes();
+        
     }
 
     private void enableButtons(GuiCondition condition) {
@@ -228,6 +294,7 @@ public class Controller {
                 closePLDMenuItem.setDisable(true);
                 PatternsMenu.setDisable(true);
                 savePatternsReport.setDisable(true);
+                ConfirmTypesChange.setDisable(true);
                 break;
             case DATA_NO_PLD:
                 sortingOptions.setDisable(false);
@@ -240,6 +307,7 @@ public class Controller {
                 exportProjectMenuItem.setDisable(false);
                 PatternsMenu.setDisable(false);
                 savePatternsReport.setDisable(true);
+                ConfirmTypesChange.setDisable(true);
                 break;
             case PLD:
                 screenShotMenuItem.setDisable(false);
@@ -248,6 +316,7 @@ public class Controller {
                 closePLDMenuItem.setDisable(false);
                 PatternsMenu.setDisable(false);
                 savePatternsReport.setDisable(true);
+                ConfirmTypesChange.setDisable(false);
                 break;
             default:
         }
@@ -267,9 +336,10 @@ public class Controller {
 
                     Platform.runLater(new Runnable(){
                     	@Override public void run() {
-                    		if (maTypes.getChildren().size() > maTypesSizeWithoutDetails && column == 0) {
-                                maTypes.getChildren().remove(maTypesSizeWithoutDetails);
-                            }
+							/*
+							 * if (maTypes.getChildren().size() > maTypesSizeWithoutDetails && column == 0)
+							 * { //maTypes.getChildren().remove(maTypesSizeWithoutDetails); }
+							 */
                     		
                     		if(column == 0) {
                     			entityGroupDetailsScrollPane = new EntityGroupDetails(cell.getEntityGroup());
@@ -317,7 +387,7 @@ public class Controller {
 
         selectionHasChanged.bind(pld.selectionHasChangedProperty());
         selectionHasChanged.addListener(selectionHasChangedListener);
-        initializeMATypes();
+        //initializeMATypes();
 
         
         createJTableMouseListener();
@@ -326,6 +396,8 @@ public class Controller {
         
         
         enableButtons(GuiCondition.DATA_NO_PLD);
+        
+        initalizeClusterTypes();
     }
 
 
@@ -366,9 +438,10 @@ public class Controller {
     private void showPLDAfterSettingsChange() {
     	diagramsVBox.getChildren().remove(pld);
         diagramsVBox.getChildren().remove(pldButtonBar);
-        if (maTypes.getChildren().size() > maTypesSizeWithoutDetails) {
-            maTypes.getChildren().remove(maTypesSizeWithoutDetails);
-        }
+		/*
+		 * if (maTypes.getChildren().size() > maTypesSizeWithoutDetails) {
+		 * //maTypes.getChildren().remove(maTypesSizeWithoutDetails); }
+		 */
         pld = new PLDiagram(
                 mainController.getChartData(),
                 mainController.getPhases(),null);
@@ -378,65 +451,61 @@ public class Controller {
         
     }
     
-    private void initializeMATypes() {
-        if (maTypes.getChildren().size() != 0) {
-            maTypes.getChildren().clear();
-        }
-
-        Label measurementTypeLabel = new Label("Available measurement types: ");
-        measurementTypeLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
-        measurementTypeLabel.setPadding(new Insets(10,5,10,5));
-
-        maTypes.getChildren().add(measurementTypeLabel);
-        ToggleGroup measurementTypeGroup = new ToggleGroup();
-        for (Constants.MeasurementType tmpMeasurementType: mainController.getAvailableMeasurementTypesList()){
-            RadioButton measurementTypeRadioButton = new RadioButton();
-            measurementTypeRadioButton.setStyle("-fx-text-fill:  white");
-            measurementTypeRadioButton.setText(String.valueOf(tmpMeasurementType));
-            measurementTypeRadioButton.setToggleGroup(measurementTypeGroup);
-            measurementTypeRadioButton.setOnAction(event -> measurementType = tmpMeasurementType);
-            measurementTypeRadioButton.setPadding(new Insets(5,5,5,5));
-
-            if (mainController.getMeasurementType() == tmpMeasurementType) {
-                measurementTypeRadioButton.setSelected(true);
-                measurementType = tmpMeasurementType;
-            }
-
-            maTypes.getChildren().add(measurementTypeRadioButton);
-        }
-
-        maTypes.getChildren().add(new Separator());
-        Label aggregationTypeLabel = new Label("Available aggregation types: ");
-        aggregationTypeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: white");
-        aggregationTypeLabel.setPadding(new Insets(10,5,10,5));
-        maTypes.getChildren().add(aggregationTypeLabel);
-
-        ToggleGroup aggregationTypeGroup = new ToggleGroup();
-        for (Constants.AggregationType tmpAggregationType: mainController.getAvailableAggregationTypesList()){
-            RadioButton aggregationTypeRadioButton = new RadioButton();
-            aggregationTypeRadioButton.setStyle("-fx-text-fill: white");
-            aggregationTypeRadioButton.setText(String.valueOf(tmpAggregationType));
-            aggregationTypeRadioButton.setToggleGroup(aggregationTypeGroup);
-            aggregationTypeRadioButton.setOnAction(event -> aggregationType = tmpAggregationType);
-            aggregationTypeRadioButton.setPadding(new Insets(5,5,5,5));
-
-            if (mainController.getAggregationType() == tmpAggregationType) {
-                aggregationTypeRadioButton.setSelected(true);
-                aggregationType = tmpAggregationType;
-            }
-
-            maTypes.getChildren().add(aggregationTypeRadioButton);
-        }
-        Button confirmButton = new Button("confirm");
-        confirmButton.setPadding(new Insets(10,100,10,100));
-        confirmButton.setOnAction(event -> {
-        	mainController.generateChartDataOfType(measurementType, aggregationType);
-        	showPLDAfterSettingsChange();
-        });
-        maTypes.getChildren().add(confirmButton);
-        maTypesSizeWithoutDetails = maTypes.getChildren().size();
-        
-    }
+	/*
+	 * private void initializeMATypes() { if (maTypes.getChildren().size() != 0) {
+	 * maTypes.getChildren().clear(); }
+	 * 
+	 * Label measurementTypeLabel = new Label("Available measurement types: ");
+	 * measurementTypeLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;"
+	 * ); measurementTypeLabel.setPadding(new Insets(10,5,10,5));
+	 * 
+	 * maTypes.getChildren().add(measurementTypeLabel); ToggleGroup
+	 * measurementTypeGroup = new ToggleGroup(); for (Constants.MeasurementType
+	 * tmpMeasurementType: mainController.getAvailableMeasurementTypesList()){
+	 * RadioButton measurementTypeRadioButton = new RadioButton();
+	 * measurementTypeRadioButton.setStyle("-fx-text-fill:  white");
+	 * measurementTypeRadioButton.setText(String.valueOf(tmpMeasurementType));
+	 * measurementTypeRadioButton.setToggleGroup(measurementTypeGroup);
+	 * measurementTypeRadioButton.setOnAction(event -> measurementType =
+	 * tmpMeasurementType); measurementTypeRadioButton.setPadding(new
+	 * Insets(5,5,5,5));
+	 * 
+	 * if (mainController.getMeasurementType() == tmpMeasurementType) {
+	 * measurementTypeRadioButton.setSelected(true); measurementType =
+	 * tmpMeasurementType; }
+	 * 
+	 * maTypes.getChildren().add(measurementTypeRadioButton); }
+	 * 
+	 * maTypes.getChildren().add(new Separator()); Label aggregationTypeLabel = new
+	 * Label("Available aggregation types: ");
+	 * aggregationTypeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: white");
+	 * aggregationTypeLabel.setPadding(new Insets(10,5,10,5));
+	 * maTypes.getChildren().add(aggregationTypeLabel);
+	 * 
+	 * ToggleGroup aggregationTypeGroup = new ToggleGroup(); for
+	 * (Constants.AggregationType tmpAggregationType:
+	 * mainController.getAvailableAggregationTypesList()){ RadioButton
+	 * aggregationTypeRadioButton = new RadioButton();
+	 * aggregationTypeRadioButton.setStyle("-fx-text-fill: white");
+	 * aggregationTypeRadioButton.setText(String.valueOf(tmpAggregationType));
+	 * aggregationTypeRadioButton.setToggleGroup(aggregationTypeGroup);
+	 * aggregationTypeRadioButton.setOnAction(event -> aggregationType =
+	 * tmpAggregationType); aggregationTypeRadioButton.setPadding(new
+	 * Insets(5,5,5,5));
+	 * 
+	 * if (mainController.getAggregationType() == tmpAggregationType) {
+	 * aggregationTypeRadioButton.setSelected(true); aggregationType =
+	 * tmpAggregationType; }
+	 * 
+	 * maTypes.getChildren().add(aggregationTypeRadioButton); } Button confirmButton
+	 * = new Button("confirm"); confirmButton.setPadding(new Insets(10,100,10,100));
+	 * confirmButton.setOnAction(event -> {
+	 * mainController.generateChartDataOfType(measurementType, aggregationType);
+	 * showPLDAfterSettingsChange(); }); maTypes.getChildren().add(confirmButton);
+	 * maTypesSizeWithoutDetails = maTypes.getChildren().size();
+	 * 
+	 * }
+	 */
 
     @FXML
     public void sortByActivityD() {
@@ -638,8 +707,9 @@ public class Controller {
         
 		frame.setTitle("PLD with patterns highlighted");
         frame.add(fxPanel);
-        frame.setSize(new Dimension(600,600));
-        frame.setLocationRelativeTo(null);
+        //frame.setSize(new Dimension(600,600));
+        //frame.setLocationRelativeTo(null);
+        frame.setExtendedState(frame.getExtendedState()|javax.swing.JFrame.MAXIMIZED_BOTH );
 		frame.setVisible(true);
 		savePatternsReport.setDisable(false);
     }
