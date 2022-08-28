@@ -124,7 +124,7 @@ public class PatternManager implements IPatternManager {
 			if(patternList.size() > 0) {
 				double patternsComputationTimeSeconds = (double) patternsComputationTime / 1_000_000_000;
 				
-				fileWriter.write(projectName + "\tPatterns computation(sec)\t" + patternsComputationTimeSeconds + "\n");
+				fileWriter.write(projectName + "\tPatterns computation(sec):\t" + patternsComputationTimeSeconds + "\n");
 			}
 						
 			fileWriter.write("\n");

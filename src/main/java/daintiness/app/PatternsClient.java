@@ -47,6 +47,7 @@ public class PatternsClient {
 			}
 
 		}
+		System.out.println("Τhe patterns reports have been created.");
 	}
 	
 }
