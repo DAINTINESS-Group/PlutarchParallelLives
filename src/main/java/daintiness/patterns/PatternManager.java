@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import daintiness.clustering.Phase;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
@@ -17,11 +18,19 @@ import javafx.collections.ObservableList;
 public class PatternManager implements IPatternManager {
 	private IPatternComputationHandler patternComputationHandler;
 	private Long patternsComputationTime;
+	private int numberOfTotalRows;
+	private int numberOfTotalColumns;
+	
 
 	public List<PatternData> getPatterns(ObservableList<ChartGroupPhaseMeasurement> totalValues, List<Phase> totalPhases, PatternType patternType) {
 		
 		PatternComputationHandlerFactory patternComputationHandlerFactory = new PatternComputationHandlerFactory();
 		patternComputationHandler = patternComputationHandlerFactory.getPatternComputationHandler("SIMPLE_PATTERN_COMPUTATION_HANDLER");
+		
+		//data for printing purposes
+		numberOfTotalRows = totalValues.size();
+		numberOfTotalColumns = totalPhases.size();
+		
 		
 		List<PatternData> patternList = new ArrayList<PatternData>();
 		
@@ -38,15 +47,24 @@ public class PatternManager implements IPatternManager {
 	public void printPatterns(List<PatternData> patternList, File file, String projectName) {
 		try {
 			FileWriter fileWriter = new FileWriter(file);
-			fileWriter.write("Project Name: " + projectName + "\n");  
-			fileWriter.write("Number of total patterns: " + patternList.size() + "\n"); 
+			fileWriter.write("Project Name:\t" + projectName + "\n");  
+			
 			
 			int birthsPatterns = 0;
 			int deathsPatterns = 0;
 			int updatesPatterns = 0;
 			int ladderPatterns = 0;
 			
+			
+			List<String> allEntities = new ArrayList<String>();
+			List<Integer> allPhases = new ArrayList<Integer>();
+			
+			String patternDataInfo = "";
+			
 			for (var pattern : patternList) {
+				
+				patternDataInfo+=pattern.getPatternType().toString() + "\n";
+				
 				if(pattern.getPatternType() == PatternType.MULTIPLE_BIRTHS) {
 					birthsPatterns+=1;
 				
@@ -64,41 +82,68 @@ public class PatternManager implements IPatternManager {
 				
 				}
 				
+				if (pattern.getPatternCellsList().size() > 0) {
+					
+					patternDataInfo+="The pattern consists of " + pattern.getPatternCellsList().size() +" cells\n";
+					
+					for (var item : pattern.getPatternCellsList()) {
+						allEntities.add(item.getEntityName());
+						allPhases.add(item.getPhaseId());
+						
+						patternDataInfo+="Entity Name : " + item.getEntityName() + " PhaseId: " + item.getPhaseId() + "\n";
+					}
+				}
+				patternDataInfo+="\n";
+				
 			}
 			
+			List<String> distinctAllEntities = allEntities.stream().distinct().collect(Collectors.toList());
+			List<Integer> distinctAllPhases = allPhases.stream().distinct().collect(Collectors.toList());
+			
+			fileWriter.write(projectName + "\tNumber of columns:\t" + numberOfTotalColumns + "\n");
+			fileWriter.write(projectName + "\tNumber of rows:\t" + numberOfTotalRows + "\n");
+			
+			fileWriter.write(projectName + "\tNumber of columns that participate in patterns:\t" + distinctAllPhases.size() + "\n");
+			fileWriter.write(projectName + "\tNumber of rows that participate in patterns:\t" + distinctAllEntities.size() + "\n");
+			
+			fileWriter.write(projectName + "\tNumber of total patterns:\t" + patternList.size() + "\n"); 
+			
 			if(birthsPatterns > 0) {
-				fileWriter.write("Number of births patterns: " + birthsPatterns + "\n");
+				fileWriter.write(projectName + "\tNumber of births patterns:\t" + birthsPatterns + "\n");
 			}
 			if(deathsPatterns > 0) {
-				fileWriter.write("Number of deaths patterns: " + deathsPatterns + "\n");			
+				fileWriter.write(projectName + "\tNumber of deaths patterns:\t" + deathsPatterns + "\n");			
 						}
 			if(updatesPatterns > 0) {
-				fileWriter.write("Number of updates patterns: " + updatesPatterns + "\n");
+				fileWriter.write(projectName + "\tNumber of updates patterns:\t" + updatesPatterns + "\n");
 			}
 			if(ladderPatterns > 0) {
-				fileWriter.write("Number of ladder patterns: " + ladderPatterns + "\n");
+				fileWriter.write(projectName + "\tNumber of ladder patterns:\t" + ladderPatterns + "\n");
 			}
 			
 			if(patternList.size() > 0) {
 				double patternsComputationTimeSeconds = (double) patternsComputationTime / 1_000_000_000;
 				
-				fileWriter.write("Patterns computation took " + patternsComputationTimeSeconds + " seconds\n");
+				fileWriter.write(projectName + "\tPatterns computation(sec)\t" + patternsComputationTimeSeconds + "\n");
 			}
-			
-			
+						
 			fileWriter.write("\n");
-			for (var pattern : patternList) {
-				fileWriter.write(pattern.getPatternType().toString() + "\n");
-				
-				if (pattern.getPatternCellsList().size() > 0) {
-					fileWriter.write("The pattern consists of " + pattern.getPatternCellsList().size() +" cells\n");
-					for (var item : pattern.getPatternCellsList()) {
-						fileWriter.write("Entity Name : " + item.getEntityName() + " PhaseId: " + item.getPhaseId() + "\n");
-					}
-				}
-				fileWriter.write("\n");
-				
-			}
+			/*
+			 * for (var pattern : patternList) {
+			 * fileWriter.write(pattern.getPatternType().toString() + "\n");
+			 * 
+			 * if (pattern.getPatternCellsList().size() > 0) {
+			 * fileWriter.write("The pattern consists of " +
+			 * pattern.getPatternCellsList().size() +" cells\n"); for (var item :
+			 * pattern.getPatternCellsList()) { fileWriter.write("Entity Name : " +
+			 * item.getEntityName() + " PhaseId: " + item.getPhaseId() + "\n"); } }
+			 * fileWriter.write("\n");
+			 * 
+			 * }
+			 */
+						
+			fileWriter.write(patternDataInfo);
+			
 			fileWriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
