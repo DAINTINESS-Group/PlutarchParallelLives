@@ -10,7 +10,7 @@ import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 
 import javax.swing.BorderFactory;
-
+import javax.swing.JScrollPane;
 //import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
@@ -52,7 +52,7 @@ public class PLDiagram extends ScrollPane {
     private Phase selectedPhase;
     
     private List<Phase> phasesJTable;
-    //private JScrollPane jScrollPane;
+    private JScrollPane jScrollPane;
     private JTable table;
     private SwingNode swingNode;
     private DefaultTableModel tableModel;
@@ -121,7 +121,7 @@ public class PLDiagram extends ScrollPane {
 			        table.getRowHeight() *  (observableList.size() + 2)));
 		
 
-		//jScrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		jScrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		
 
@@ -136,8 +136,8 @@ public class PLDiagram extends ScrollPane {
 		
         
         swingNode = new SwingNode();
-        //swingNode.setContent(jScrollPane);
-        swingNode.setContent(table);
+        swingNode.setContent(jScrollPane);
+        //swingNode.setContent(table);
 
         group.getChildren().add(swingNode);
         //group.prefHeight(900);
