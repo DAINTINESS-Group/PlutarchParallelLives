@@ -13,12 +13,8 @@ import javax.swing.table.TableModel;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +34,6 @@ public class PLDiagramSwing{
 
     private final int cellWidth = 25;
     private final int firstColumnWidth = 110;
-
-    private final double minScale = 0.2;
-    private final double maxScale = 2.0;
 
     private EntityGroup selectedGroup;
     private IMeasurement selectedMeasurement;

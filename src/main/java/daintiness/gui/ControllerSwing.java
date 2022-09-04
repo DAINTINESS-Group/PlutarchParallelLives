@@ -2,15 +2,12 @@ package daintiness.gui;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import daintiness.clustering.BeatClusteringProfile;
 import daintiness.clustering.ClusteringProfile;
 import daintiness.clustering.EntityClusteringProfile;
-import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 
 import daintiness.gui.tableview.PLDiagramSwing;
 import daintiness.maincontroller.IMainController;
@@ -22,8 +19,6 @@ import daintiness.utilities.Constants.MeasurementType;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -207,9 +202,6 @@ public class ControllerSwing {
                 mainController.getPhases(),null);
         
         pldJScrollPane =  pld.getJScrollPane();
-        //createJTableMouseListener();
-        
-        
     }
     
     public void generateDataWithClusterTypes(String measurementType, String aggregationType) {

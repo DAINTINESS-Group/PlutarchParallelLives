@@ -80,9 +80,6 @@ public class MainAppSwing extends JFrame {
 	
 	private String selectedAggregationType;
 	private String selectedMeasurementType;
-	
-	private double zoom = 1.0;  // zoom factor
-    private BufferedImage image = null;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -675,6 +672,17 @@ public class MainAppSwing extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				controller.showDeathsPatterns();
+				savePatternsReportMI.setEnabled(true);
+			}
+		});
+		
+		JMenuItem ladderPaternsMI = new JMenuItem("Ladders Patterns");
+		showPatternsMenu.add(ladderPaternsMI);
+		
+		ladderPaternsMI.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.showLadderPatterns();
 				savePatternsReportMI.setEnabled(true);
 			}
 		});

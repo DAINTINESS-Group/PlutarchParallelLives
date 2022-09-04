@@ -10,8 +10,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import javafx.beans.binding.Bindings;
-
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 
