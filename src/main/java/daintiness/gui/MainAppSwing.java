@@ -266,15 +266,17 @@ public class MainAppSwing extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				controller.importProject();
-				getContentPane().removeAll();
-				setJScrollPaneToJPanel(controller.getPldScrollPane());
-				revalidate();
-				repaint();
+
 				
 				exportProjectMI.setEnabled(true);
 				ClusterDataMI.setEnabled(true);
 				SaveMI.setEnabled(true);
 				SaveAsMI.setEnabled(true);
+				showPLDMI.setEnabled(true);
+				showPatternsMenu.setEnabled(true);
+				
+				showPLDMI.doClick();
+
 			}
 		});
 		

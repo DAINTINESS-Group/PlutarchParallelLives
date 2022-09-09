@@ -58,10 +58,10 @@ public class ControllerSwing {
 		fileChooser.setCurrentDirectory(initialDirectory);
 		fileChooser.setDialogTitle("Select a folder");
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fileChooser.showSaveDialog(null);
+		int result = fileChooser.showSaveDialog(null);
 		
 		File selectedDirectory = fileChooser.getSelectedFile();
-		if ((selectedDirectory != null) && selectedDirectory.exists()) {
+		if ((selectedDirectory != null) && selectedDirectory.exists() && result == JFileChooser.APPROVE_OPTION) {
             mainController.load(selectedDirectory);
             return true;
         }
@@ -74,10 +74,10 @@ public class ControllerSwing {
 		fileChooser.setCurrentDirectory(initialDirectory);
 		fileChooser.setDialogTitle("Select a file");
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.showSaveDialog(null);
+		int result = fileChooser.showSaveDialog(null);
 		
 		File selectedFile = fileChooser.getSelectedFile();
-		if ((selectedFile != null) && selectedFile.exists()) {
+		if ((selectedFile != null) && selectedFile.exists() && result == JFileChooser.APPROVE_OPTION) {
             mainController.load(selectedFile);
             return true;
         }
