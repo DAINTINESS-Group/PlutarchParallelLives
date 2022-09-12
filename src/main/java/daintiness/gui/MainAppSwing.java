@@ -80,6 +80,7 @@ public class MainAppSwing extends JFrame {
 	
 	private String selectedAggregationType;
 	private String selectedMeasurementType;
+	private JMenuItem openZoomablePLDMI;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -239,12 +240,26 @@ public class MainAppSwing extends JFrame {
 				lifeDurationSortMenu.setEnabled(true);	
 				birthDateSortMenu.setEnabled(true);
 				generateClusteredDataMI.setEnabled(true);
+				openZoomablePLDMI.setEnabled(true);
 			}
 		});
 		
 		closePLDMI = new JMenuItem("Close PLD");
 		closePLDMI.setEnabled(false);
 		PldMenu.add(closePLDMI);
+		
+		openZoomablePLDMI = new JMenuItem("Open Zoomable PLD");
+		openZoomablePLDMI.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.openZoomablePLD();
+				getContentPane().removeAll();
+				revalidate();
+				repaint();
+			}
+		});
+		openZoomablePLDMI.setEnabled(false);
+		PldMenu.add(openZoomablePLDMI);
 		
 		closePLDMI.addActionListener(new ActionListener() {
 

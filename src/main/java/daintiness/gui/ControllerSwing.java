@@ -8,7 +8,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import daintiness.clustering.BeatClusteringProfile;
 import daintiness.clustering.ClusteringProfile;
 import daintiness.clustering.EntityClusteringProfile;
-
 import daintiness.gui.tableview.PLDiagramSwing;
 import daintiness.maincontroller.IMainController;
 import daintiness.maincontroller.MainControllerFactory;
@@ -16,6 +15,13 @@ import daintiness.models.PatternData;
 import daintiness.utilities.Constants;
 import daintiness.utilities.Constants.AggregationType;
 import daintiness.utilities.Constants.MeasurementType;
+import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.embed.swing.SwingNode;
+import javafx.scene.layout.Pane;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -381,5 +387,80 @@ public class ControllerSwing {
 			mainController.printPatterns(new File(selectedFilePath));
         }
 	}
+	
+	public void openZoomablePLD() {
+    	javax.swing.JFrame frame = new javax.swing.JFrame(); 
+        
+		frame.setTitle("Zoomable PLD");
+	
+		
+		javafx.embed.swing.JFXPanel fxPanel = new javafx.embed.swing.JFXPanel();
+		
+
+    	SwingNode swingNodeJScrollPane = new SwingNode();
+
+    	Pane pane = new Pane();
+    	
+		
+
+		
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	swingNodeJScrollPane.setContent(pld.getJScrollPane());
+        		pane.getChildren().add(swingNodeJScrollPane);
+
+        		javafx.scene.Scene sc = new javafx.scene.Scene(pane);
+        		fxPanel.setScene(sc);
+        		enableZoomJTable(swingNodeJScrollPane,pane ,20,100);
+            }
+        });
+
+        
+        frame.add(fxPanel);
+		frame.setSize(new Dimension(1097, 837));
+		frame.setVisible(true);
+	}
+	
+	private void enableZoomJTable(SwingNode jScrollpane, Pane node,double tableWidth, double tableHeight) {
+		node.setOnScroll(scrollEvent -> {
+
+            double translationFactor = 0.02;
+            double zoomFactor = 1 + translationFactor;
+            double deltaY = scrollEvent.getDeltaY();
+
+            
+            if (deltaY < 0) {
+                zoomFactor = 2 - zoomFactor;
+                translationFactor = -0.02;
+            }
+            
+            DoubleProperty widthProperty = new SimpleDoubleProperty();
+            DoubleProperty heightProperty = new SimpleDoubleProperty();
+            
+            widthProperty.set(tableWidth);
+            heightProperty.set(tableHeight);
+            
+            
+            
+            Translate center = new Translate(node.getTranslateX(), node.getTranslateY());
+            center.xProperty().bind(widthProperty.multiply(translationFactor));
+            center.yProperty().bind(heightProperty.multiply(-translationFactor));
+
+
+            Scale scale = new Scale();
+            scale.xProperty().setValue(zoomFactor);
+            scale.yProperty().setValue(zoomFactor);
+
+
+            if ((node.getScaleX() > 0.2 && zoomFactor < 1) ||
+                    (node.getScaleX() < 1.5 && zoomFactor > 1)) {
+            	
+            	jScrollpane.getTransforms().addAll(scale, center);
+            }
+
+            scrollEvent.consume();
+        });
+    }
 	 
 }
