@@ -108,23 +108,26 @@ public class PatternManager implements IPatternManager {
 			
 			fileWriter.write(projectName + "\tNumber of total patterns:\t" + patternList.size() + "\n"); 
 			
-			if(birthsPatterns > 0) {
+			//if(birthsPatterns > 0) {
 				fileWriter.write(projectName + "\tNumber of births patterns:\t" + birthsPatterns + "\n");
-			}
-			if(deathsPatterns > 0) {
+			//}
+			//if(deathsPatterns > 0) {
 				fileWriter.write(projectName + "\tNumber of deaths patterns:\t" + deathsPatterns + "\n");			
-						}
-			if(updatesPatterns > 0) {
+			//			}
+			//if(updatesPatterns > 0) {
 				fileWriter.write(projectName + "\tNumber of updates patterns:\t" + updatesPatterns + "\n");
-			}
-			if(ladderPatterns > 0) {
+			//}
+			//if(ladderPatterns > 0) {
 				fileWriter.write(projectName + "\tNumber of ladder patterns:\t" + ladderPatterns + "\n");
-			}
+			//}
 			
 			if(patternList.size() > 0) {
 				double patternsComputationTimeSeconds = (double) patternsComputationTime / 1_000_000_000;
 				
 				fileWriter.write(projectName + "\tPatterns computation(sec):\t" + patternsComputationTimeSeconds + "\n");
+			}
+			else {
+				fileWriter.write(projectName + "\tPatterns computation(sec):\t0\n");
 			}
 						
 			fileWriter.write("\n");
