@@ -19,6 +19,9 @@ import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.embed.swing.SwingNode;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
@@ -399,20 +402,20 @@ public class ControllerSwing {
 
     	SwingNode swingNodeJScrollPane = new SwingNode();
 
-    	Pane pane = new Pane();
-    	
-		
-
+    	Group group = new Group();
 		
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+            	
+            	ScrollPane scrollPane = new ScrollPane();
             	swingNodeJScrollPane.setContent(pld.getJScrollPane());
-        		pane.getChildren().add(swingNodeJScrollPane);
-
-        		javafx.scene.Scene sc = new javafx.scene.Scene(pane);
+            	
+            	group.getChildren().add(swingNodeJScrollPane);
+            	scrollPane.setContent(group);
+        		javafx.scene.Scene sc = new javafx.scene.Scene(scrollPane);
         		fxPanel.setScene(sc);
-        		enableZoomJTable(swingNodeJScrollPane,pane ,20,100);
+        		enableZoomJTable(swingNodeJScrollPane,group ,20,100);
             }
         });
 
@@ -422,8 +425,8 @@ public class ControllerSwing {
 		frame.setVisible(true);
 	}
 	
-	private void enableZoomJTable(SwingNode jScrollpane, Pane node,double tableWidth, double tableHeight) {
-		node.setOnScroll(scrollEvent -> {
+	private void enableZoomJTable(SwingNode scrollPane, Group group,double tableWidth, double tableHeight) {
+		group.setOnScroll(scrollEvent -> {
 
             double translationFactor = 0.02;
             double zoomFactor = 1 + translationFactor;
@@ -443,7 +446,7 @@ public class ControllerSwing {
             
             
             
-            Translate center = new Translate(node.getTranslateX(), node.getTranslateY());
+            Translate center = new Translate(group.getTranslateX(), group.getTranslateY());
             center.xProperty().bind(widthProperty.multiply(translationFactor));
             center.yProperty().bind(heightProperty.multiply(-translationFactor));
 
@@ -453,10 +456,10 @@ public class ControllerSwing {
             scale.yProperty().setValue(zoomFactor);
 
 
-            if ((node.getScaleX() > 0.2 && zoomFactor < 1) ||
-                    (node.getScaleX() < 1.5 && zoomFactor > 1)) {
+            if ((group.getScaleX() > 0.2 && zoomFactor < 1) ||
+                    (group.getScaleX() < 1.5 && zoomFactor > 1)) {
             	
-            	jScrollpane.getTransforms().addAll(scale, center);
+            	scrollPane.getTransforms().addAll(scale, center);
             }
 
             scrollEvent.consume();

@@ -27,7 +27,7 @@ public class PatternManager implements IPatternManager {
 		PatternComputationHandlerFactory patternComputationHandlerFactory = new PatternComputationHandlerFactory();
 		patternComputationHandler = patternComputationHandlerFactory.getPatternComputationHandler("SIMPLE_PATTERN_COMPUTATION_HANDLER");
 		
-		//data for printing purposes
+		//Data for printing purposes
 		numberOfTotalRows = totalValues.size();
 		numberOfTotalColumns = totalPhases.size();
 		
@@ -40,7 +40,6 @@ public class PatternManager implements IPatternManager {
 		
 		patternsComputationTime = end - start;
 
-		//printPatterns(patternList);
         return patternList;
 	}
 
@@ -107,20 +106,13 @@ public class PatternManager implements IPatternManager {
 			fileWriter.write(projectName + "\tNumber of rows that participate in patterns:\t" + distinctAllEntities.size() + "\n");
 			
 			fileWriter.write(projectName + "\tNumber of total patterns:\t" + patternList.size() + "\n"); 
-			
-			//if(birthsPatterns > 0) {
-				fileWriter.write(projectName + "\tNumber of births patterns:\t" + birthsPatterns + "\n");
-			//}
-			//if(deathsPatterns > 0) {
-				fileWriter.write(projectName + "\tNumber of deaths patterns:\t" + deathsPatterns + "\n");			
-			//			}
-			//if(updatesPatterns > 0) {
-				fileWriter.write(projectName + "\tNumber of updates patterns:\t" + updatesPatterns + "\n");
-			//}
-			//if(ladderPatterns > 0) {
-				fileWriter.write(projectName + "\tNumber of ladder patterns:\t" + ladderPatterns + "\n");
-			//}
-			
+			fileWriter.write(projectName + "\tNumber of births patterns:\t" + birthsPatterns + "\n");
+			fileWriter.write(projectName + "\tNumber of deaths patterns:\t" + deathsPatterns + "\n");
+
+			fileWriter.write(projectName + "\tNumber of updates patterns:\t" + updatesPatterns + "\n");
+
+			fileWriter.write(projectName + "\tNumber of ladder patterns:\t" + ladderPatterns + "\n");
+
 			if(patternList.size() > 0) {
 				double patternsComputationTimeSeconds = (double) patternsComputationTime / 1_000_000_000;
 				
