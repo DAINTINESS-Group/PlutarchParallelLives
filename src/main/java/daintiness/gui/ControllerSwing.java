@@ -1,9 +1,15 @@
 package daintiness.gui;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.JTableHeader;
 
 import daintiness.clustering.BeatClusteringProfile;
 import daintiness.clustering.ClusteringProfile;
@@ -15,19 +21,13 @@ import daintiness.models.PatternData;
 import daintiness.utilities.Constants;
 import daintiness.utilities.Constants.AggregationType;
 import daintiness.utilities.Constants.MeasurementType;
-import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.embed.swing.SwingNode;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.transform.Scale;
-import javafx.scene.transform.Translate;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +52,8 @@ public class ControllerSwing {
 	private int numberOfBeats;
 	
 	private int numberOfEntities;
+	
+	private JLabel label;
 	
 
 	public ControllerSwing() {
@@ -117,7 +119,7 @@ public class ControllerSwing {
     	chooser.setCurrentDirectory(new File(
     			"src" + Constants.FS + "main" + Constants.FS + "resources"));
     	chooser.setDialogTitle("Save as");
-    	chooser.addChoosableFileFilter(new FileNameExtensionFilter("*.jpg", "jpg"));
+    	chooser.addChoosableFileFilter(new FileNameExtensionFilter("*.tsv", "tsv"));
     	chooser.showSaveDialog(null);
 		
 		File selectedFile = chooser.getSelectedFile();
@@ -237,30 +239,24 @@ public class ControllerSwing {
     }
     
     public void takeScreenshot() {
-    	JFileChooser fileChooser = new JFileChooser(); 
-    	fileChooser.setCurrentDirectory(new File("src" + Constants.FS + "main" + Constants.FS + "resources"));
-    	fileChooser.setDialogTitle("Save image of PLD");
-    	fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.png", "png"));
-    	fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.jpg", "jpg"));
-    	fileChooser.showSaveDialog(null);
+		
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File("src" + Constants.FS + "main" + Constants.FS + "resources"));
+		fileChooser.setDialogTitle("Save image of PLD");
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.png", "png"));
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("*.jpg", "jpg"));
+		fileChooser.showSaveDialog(null);
 
 		File selectedFile = fileChooser.getSelectedFile();
 		if (selectedFile != null && pld.getJTable() != null) {
-			
+
 			String selectedFilePath = selectedFile.getAbsolutePath();
 			if (!selectedFilePath.endsWith(".png")) {
 				selectedFilePath = selectedFilePath + ".png";
 			}
-			BufferedImage img = new BufferedImage(pld.getJTable().getWidth(), pld.getJTable().getHeight(), BufferedImage.TYPE_INT_RGB);
-			pld.getJTable().paintAll(img.getGraphics());
+			saveToImage(pld.getJTable(),pld.getJTable().getTableHeader(),new File(selectedFilePath));
+		}
 
-	    	try {
-				ImageIO.write(img, "png", new File(selectedFilePath));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
     }
     
     
@@ -395,75 +391,98 @@ public class ControllerSwing {
     	javax.swing.JFrame frame = new javax.swing.JFrame(); 
         
 		frame.setTitle("Zoomable PLD");
-	
-		
-		javafx.embed.swing.JFXPanel fxPanel = new javafx.embed.swing.JFXPanel();
-		
 
-    	SwingNode swingNodeJScrollPane = new SwingNode();
+		JTable table = pld.getJTable();
+		JTableHeader header = pld.getJTable().getTableHeader();
 
-    	Group group = new Group();
+		int w = Math.max(table.getWidth(), header.getWidth());
+		int h = table.getHeight() + header.getHeight();
+		BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2 = bi.createGraphics();
+		header.paint(g2);
+		g2.translate(0, header.getHeight());
+		table.paint(g2);
+		g2.dispose();
 		
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-            	
-            	ScrollPane scrollPane = new ScrollPane();
-            	swingNodeJScrollPane.setContent(pld.getJScrollPane());
-            	
-            	group.getChildren().add(swingNodeJScrollPane);
-            	scrollPane.setContent(group);
-        		javafx.scene.Scene sc = new javafx.scene.Scene(scrollPane);
-        		fxPanel.setScene(sc);
-        		enableZoomJTable(swingNodeJScrollPane,group ,20,100);
-            }
-        });
+		label = new JLabel(new ImageIcon(bi));
 
-        
-        frame.add(fxPanel);
+		JPanel panel = new JPanel();
+		panel.add(label);
+		
+		JScrollPane scrollPane = new JScrollPane(panel);
+		frame.add(scrollPane);
+		
+		panel.addMouseWheelListener(new MouseWheelListener() {
+			
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				// TODO Auto-generated method stub
+				int point = e.getWheelRotation();
+				if(point<0) {
+					ZoomIn(bi);
+				}
+				else{
+					ZoomOut(bi);
+				}
+			}
+		});
+		
+		frame.pack();
 		frame.setSize(new Dimension(1097, 837));
-		frame.setVisible(true);
+		frame.setVisible(true); 
+
 	}
 	
-	private void enableZoomJTable(SwingNode scrollPane, Group group,double tableWidth, double tableHeight) {
-		group.setOnScroll(scrollEvent -> {
-
-            double translationFactor = 0.02;
-            double zoomFactor = 1 + translationFactor;
-            double deltaY = scrollEvent.getDeltaY();
-
-            
-            if (deltaY < 0) {
-                zoomFactor = 2 - zoomFactor;
-                translationFactor = -0.02;
-            }
-            
-            DoubleProperty widthProperty = new SimpleDoubleProperty();
-            DoubleProperty heightProperty = new SimpleDoubleProperty();
-            
-            widthProperty.set(tableWidth);
-            heightProperty.set(tableHeight);
-            
-            
-            
-            Translate center = new Translate(group.getTranslateX(), group.getTranslateY());
-            center.xProperty().bind(widthProperty.multiply(translationFactor));
-            center.yProperty().bind(heightProperty.multiply(-translationFactor));
-
-
-            Scale scale = new Scale();
-            scale.xProperty().setValue(zoomFactor);
-            scale.yProperty().setValue(zoomFactor);
-
-
-            if ((group.getScaleX() > 0.2 && zoomFactor < 1) ||
-                    (group.getScaleX() < 1.5 && zoomFactor > 1)) {
-            	
-            	scrollPane.getTransforms().addAll(scale, center);
-            }
-
-            scrollEvent.consume();
-        });
+	public void ZoomIn(Image img) {
+		int w = label.getWidth();
+		int h = label.getHeight();
+		ImageIcon icon = new ImageIcon(ZoomImage(w+label.getWidth()/5,h+label.getHeight()/5,img));
+		
+		label.setIcon(icon);
+	}
+	
+	public void ZoomOut(Image img) {
+		int w = label.getWidth();
+		int h = label.getHeight();
+		ImageIcon icon = new ImageIcon(ZoomImage(w-label.getWidth()/5,h-label.getHeight()/5,img));
+		label.setIcon(icon);
+	}
+	
+	private static void saveToImage(JTable table, JTableHeader header, File file)
+    {
+        int w = Math.max(table.getWidth(), header.getWidth());
+        int h = table.getHeight() + header.getHeight();
+        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = bi.createGraphics();
+        header.paint(g2);
+        g2.translate(0, header.getHeight());
+        table.paint(g2);
+        g2.dispose();
+        try
+        {
+            ImageIO.write(bi, "png", file);
+        }
+        catch(IOException ioe)
+        {
+            System.out.println("write: " + ioe.getMessage());
+        }
     }
-	 
+	
+	public Image ZoomImage(int w, int h,Image img) {
+		BufferedImage buf = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = buf.createGraphics();
+		
+		
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+		
+        
+		g2.drawImage(img, 0,0,w,h ,null);
+		
+		
+		
+		g2.dispose();
+		return buf;
+    }
+	
 }
