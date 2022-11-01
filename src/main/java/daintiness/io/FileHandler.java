@@ -18,7 +18,8 @@ public class FileHandler implements IFileHandler {
     private File temFile;
     private File gpmFile;
     private File outputPath;
-    private String projectName;
+    @SuppressWarnings("unused")
+	private String projectName;
     private Constants.FileType fileType;
 
 

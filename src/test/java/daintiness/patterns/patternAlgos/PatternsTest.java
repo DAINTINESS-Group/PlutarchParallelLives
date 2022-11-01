@@ -124,7 +124,9 @@ public class PatternsTest {
 	
 	//The initialization is based on _threshold = 3, if that change the data should change too
 	public void initializeExpectedPatterns() {
-    	List<CellInfo> expected_multiple_Births1 = new ArrayList<CellInfo>() {{
+    	List<CellInfo> expected_multiple_Births1 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
     		add(new CellInfo("biodatabase", 0));
     		add(new CellInfo("bioentry", 0));
     		add(new CellInfo("bioentry_date", 0));
@@ -152,7 +154,9 @@ public class PatternsTest {
         expectedPatternList.add(patternData);
         
         
-        List<CellInfo> expected_multiple_Deaths = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Deaths = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("bioentry_date", 2));
     		add(new CellInfo("bioentry_description", 2));
     		add(new CellInfo("bioentry_keywords", 2));
@@ -164,7 +168,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_DEATHS,expected_multiple_Deaths);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Births2 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Births2 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("bioentry_qualifier_value", 3));
         	add(new CellInfo("dbxref", 3));
         	add(new CellInfo("dbxref_qualifier_value", 3));
@@ -175,7 +181,9 @@ public class PatternsTest {
         
 
         
-        List<CellInfo> expected_multiple_Updates1 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Updates1 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("bioentry_direct_links", 3));
         	add(new CellInfo("biosequence", 3));
     		add(new CellInfo("location_qualifier_value", 3));
@@ -185,7 +193,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates1);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Updates2 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Updates2 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("bioentry", 10));
         	add(new CellInfo("bioentry_reference", 10));
         	add(new CellInfo("biosequence", 10));
@@ -204,7 +214,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates2);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Births3 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Births3 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("ontology", 21));
     		add(new CellInfo("ontology_dbxref", 21));
     		add(new CellInfo("ontology_path", 21));
@@ -214,7 +226,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_BIRTHS,expected_multiple_Births3);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Updates3 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Updates3 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("bioentry",21));
         	add(new CellInfo("bioentry_reference", 21));
         	add(new CellInfo("biosequence", 21));
@@ -235,7 +249,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates3);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Updates4 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Updates4 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("biodatabase", 23));
         	add(new CellInfo("bioentry", 23));
         	add(new CellInfo("biosequence", 23));
@@ -246,7 +262,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates4);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Updates5 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Updates5 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("biosequence", 24));
         	add(new CellInfo("dbxref_qualifier_value", 24));
         	add(new CellInfo("ontology_relationship", 24));
@@ -255,7 +273,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates5);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Updates6 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Updates6 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("location_qualifier_value", 27));
         	add(new CellInfo("seqfeature_qualifier_value", 27));
         	add(new CellInfo("bioentry_qualifier_value", 27));
@@ -268,7 +288,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates6);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_multiple_Updates7 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_multiple_Updates7 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("seqfeature_relationship", 33));
         	add(new CellInfo("bioentry_relationship", 33));
         	add(new CellInfo("bioentry_path", 33));
@@ -277,7 +299,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.MULTIPLE_UPDATES,expected_multiple_Updates7);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_ladder1 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_ladder1 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("biodatabase", 0));
         	add(new CellInfo("bioentry", 0));
         	add(new CellInfo("bioentry_date", 0));
@@ -308,7 +332,9 @@ public class PatternsTest {
         patternData = new PatternData(PatternType.LADDER,expected_ladder1);
         expectedPatternList.add(patternData);
         
-        List<CellInfo> expected_ladder2 = new ArrayList<CellInfo>() {{
+        List<CellInfo> expected_ladder2 = new ArrayList<CellInfo>() {private static final long serialVersionUID = 1L;
+
+		{
         	add(new CellInfo("ontology", 21));
         	add(new CellInfo("ontology_dbxref", 21));
         	add(new CellInfo("ontology_path", 21));

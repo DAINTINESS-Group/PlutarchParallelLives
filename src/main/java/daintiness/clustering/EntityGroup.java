@@ -60,7 +60,8 @@ public class EntityGroup {
     }
 
 
-    private void updateGroupLifeDetails(LifeDetails newLifeDetails) {
+    @SuppressWarnings("unused")
+	private void updateGroupLifeDetails(LifeDetails newLifeDetails) {
         int birth = lifeDetails.getBirthBeatId();
         int death = lifeDetails.getDeathBeatId();
         boolean isAlive = lifeDetails.isAlive();

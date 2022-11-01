@@ -126,12 +126,12 @@ public class SchemaEvoLoader implements ILoader {
         CsvReader csvReader = new CsvReader(timeLinePath, true, "\t");
         List<String[]> rawLines = csvReader.readAll();
 
-        int i = 0;
+        //int i = 0;
         for (String[] rawLine : rawLines) {
             Beat currentBeat = parseTimeBeat(rawLine);
             timeline.add(currentBeat);
             versionToBeatIdMap.put(currentBeat.getRawDate(), currentBeat.getBeatId());
-            i++;
+          //  i++;
         }
     }
 

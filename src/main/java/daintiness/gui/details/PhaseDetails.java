@@ -7,7 +7,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
 public class PhaseDetails extends ScrollPane {
-    private Label phaseTitle;
+    //private Label phaseTitle;
     private VBox vBox;
 
     public PhaseDetails(Phase phase) {

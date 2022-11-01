@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import daintiness.clustering.BeatClusteringProfile;
-import daintiness.clustering.ClusteringProfile;
-import daintiness.clustering.EntityClusteringProfile;
 import daintiness.clustering.measurements.ChartGroupPhaseMeasurement;
 import daintiness.maincontroller.MainController;
 import daintiness.utilities.Constants;

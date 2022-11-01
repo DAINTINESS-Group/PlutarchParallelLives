@@ -98,14 +98,18 @@ public class JTableTest {
 	}
 	
 	private void initializeExpectedPLD() {
-		expectedEntities = new ArrayList<Entity>() {{
+		expectedEntities = new ArrayList<Entity>() {private static final long serialVersionUID = 1L;
+
+		{
 			add(new Entity(1,"t1",new LifeDetails(1,5,false)));
 			add(new Entity(2,"t2",new LifeDetails(0,7,false)));
 			add(new Entity(3,"t3",new LifeDetails(6,10,true)));
 			add(new Entity(4,"t4",new LifeDetails(0,10,false)));
 		}};
 		
-		expectedBeatList = new  ArrayList<Beat>(){{
+		expectedBeatList = new  ArrayList<Beat>(){private static final long serialVersionUID = 1L;
+
+		{
 			add(new Beat(1,"2009-02-11 17:25:48",dateTimeConverter("2009-02-11 17:25:48")));
 			add(new Beat(1,"2009-03-16 00:43:59",dateTimeConverter("2009-03-16 00:43:59")));
 			add(new Beat(1,"2009-03-16 13:01:18",dateTimeConverter("2009-03-16 13:01:18")));
@@ -119,7 +123,9 @@ public class JTableTest {
 			add(new Beat(1,"2009-03-20 18:13:28",dateTimeConverter("2009-03-20 18:13:28")));
 		}};
 		
-		expectedMeasurements = new ArrayList<Double>() {{
+		expectedMeasurements = new ArrayList<Double>() {private static final long serialVersionUID = 1L;
+
+		{
 			add(null);add(null);add(null);add(1.0);add(null);add(null);add(null);add(null);add(null);add(null);add(null);
 			add(null);add(null);add(1.0);add(null);add(1.0);add(null);add(null);add(null);add(null);add(null);add(null);
 			add(null);add(null);add(null);add(null);add(null);add(null);add(null);add(null);add(null);add(1.0);add(null);

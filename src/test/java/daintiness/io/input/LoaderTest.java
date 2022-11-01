@@ -3,8 +3,6 @@ package daintiness.io.input;
 import org.junit.jupiter.api.*;
 
 import daintiness.data.IDataHandler;
-import daintiness.io.input.ILoader;
-import daintiness.io.input.SimpleLoader;
 import daintiness.io.input.schemaevo.SchemaEvoLoader;
 import daintiness.models.Beat;
 import daintiness.models.Entity;

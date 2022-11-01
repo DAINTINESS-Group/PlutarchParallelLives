@@ -7,9 +7,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
 public class EntityGroupDetails extends ScrollPane {
-    private Label entityGroupNameTitle;
+    //private Label entityGroupNameTitle;
     private VBox vBox;
-    private String title;
+    //private String title;
 
     public EntityGroupDetails(EntityGroup group) {
         super();

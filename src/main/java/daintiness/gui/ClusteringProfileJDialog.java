@@ -25,6 +25,7 @@ import javax.swing.JSlider;
 
 public class ClusteringProfileJDialog extends JDialog {
 
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField numberPhasesInput;
 	private JTextField numberEntitiesInput;
